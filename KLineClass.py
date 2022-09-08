@@ -209,8 +209,7 @@ class CandlestickItem(pg.GraphicsObject):
         self.rect = None
         self.picture = None
         self.setFlag(self.ItemUsesExtendedStyleOption)
-        # 画笔和画刷
-        w = 0.4
+
         self.offset = 0
         self.low = 0
         self.high = 1
@@ -237,39 +236,39 @@ class CandlestickItem(pg.GraphicsObject):
         else:
             self.low, self.high = (0, 1)
         npic = len(self.pictures)
-        for (t, _open, _close, _low, _high) in data:
-            if t >= npic:
+        for index, row in data.iterrows():
+            if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
                 # 下跌绿色（实心）, 上涨红色（空心）
-                if _close < _open:  # 阴线情况
+                if row['close'] < row['open']:  # 阴线情况
                     p.setPen(pg.mkPen('g', width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush('g'))
-                    p.drawLine(QtCore.QPointF(t, _low), QtCore.QPointF(t, _high))  # 画上下影线
-                    p.drawRect(QtCore.QRectF(t - w, _open, w * 2, _close - _open))  # 画矩形，实心K线
+                    p.drawLine(QtCore.QPointF(index, row['low']), QtCore.QPointF(index, row['high']))  # 画上下影线
+                    p.drawRect(QtCore.QRectF(index - w, row['open'], w * 2, row['close'] - row['open']))  # 画矩形，实心K线
 
-                elif _close > _open:  # 阳线情况
+                elif row['close'] > row['open']:  # 阳线情况
                     p.setPen(pg.mkPen('r', width=2))  # red
                     p.setBrush(pg.mkBrush('r'))  # red
-                    if (_high != _close):  # 如果最高点不等于收盘价，画上影线
-                        p.drawLine(QtCore.QPointF(t, _high), QtCore.QPointF(t, _close))
-                    if (_low != _open):  # 如果最低点不等于开盘价，画下影线
-                        p.drawLine(QtCore.QPointF(t, _open), QtCore.QPointF(t, _low))
+                    if (row['high'] != row['close']):  # 如果最高点不等于收盘价，画上影线
+                        p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['close']))
+                    if (row['low'] != row['open']):  # 如果最低点不等于开盘价，画下影线
+                        p.drawLine(QtCore.QPointF(index, row['open']), QtCore.QPointF(index, row['low']))
 
                     # p.drawRect(QtCore.QRectF(i - w, open, w * 2, close - open)) # 如果画实心阳线，只需画个实心矩形即可
                     # 画空心阳线的时候，需要画四条线
 
-                    p.drawLine(QtCore.QPointF(t - w, _open), QtCore.QPointF(t - w, _close))  # 画单根K线的左边线
-                    p.drawLine(QtCore.QPointF(t + w, _open), QtCore.QPointF(t + w, _close))  # 画单根K线的右边线
-                    p.drawLine(QtCore.QPointF(t - w, _close), QtCore.QPointF(t + w, _close))  # 画单根K线的上边线
-                    p.drawLine(QtCore.QPointF(t - w, _open), QtCore.QPointF(t + w, _open))  # 画单根K线的下边线
+                    p.drawLine(QtCore.QPointF(index - w, row['open']), QtCore.QPointF(index - w, row['close']))  # 画单根K线的左边线
+                    p.drawLine(QtCore.QPointF(index + w, row['open']), QtCore.QPointF(index + w, row['close']))  # 画单根K线的右边线
+                    p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画单根K线的上边线
+                    p.drawLine(QtCore.QPointF(index - w, row['open']), QtCore.QPointF(index + w, row['open']))  # 画单根K线的下边线
 
                 else:  # 平盘情况
                     p.setPen(pg.mkPen('b', width=2))  # 十字线设为蓝色
                     p.setBrush(pg.mkBrush('b'))  # 十字线设为蓝色
 
-                    p.drawLine(QtCore.QPointF(t, _high), QtCore.QPointF(t, _low))  # 画上下影线
-                    p.drawLine(QtCore.QPointF(t - w, _close), QtCore.QPointF(t + w, _close))  # 画一条横线
+                    p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['low']))  # 画上下影线
+                    p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画一条横线
 
                 p.end()
                 self.pictures.append(picture)
@@ -306,15 +305,7 @@ class CandlestickItem(pg.GraphicsObject):
     def boundingRect(self):
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
 
-    # 计算y轴显示的范围
-    # ----------------------------------------------------------------------
-    def get_y_range(self, min_ix: int = None, max_ix: int = None) -> tuple[float, float]:
-        print(self.data)
-        min_price = self.data.loc[min_ix:max_ix].low.min()
-        max_price = self.data.loc[min_ix:max_ix].high.max()
-        print('当前显示k线范围: ', min_price, max_price)
 
-        return min_price, max_price
 
 
 ########################################################################
@@ -328,21 +319,19 @@ class VolumeItem(pg.GraphicsObject):
     def __init__(self, data: pd.DataFrame):
         """初始化"""
         pg.GraphicsObject.__init__(self)
-
         self.data = data
         # 只重画部分图形，大大提高界面更新速度
         self.rect = None
         self.picture = None
         self.setFlag(self.ItemUsesExtendedStyleOption)
-        # 画笔和画刷
-        w = 0.4
+
         self.offset = 0
         self.low = 0
         self.high = 1
         self.picture = QtGui.QPicture()
         self.pictures = []
 
-        # 刷新K线
+        # 刷新柱线
         self.generatePicture(self.data)
 
         # 画柱线
@@ -357,45 +346,41 @@ class VolumeItem(pg.GraphicsObject):
         elif self.pictures:
             self.pictures.pop()
         w = 0.4  # k线一半的宽度
+        self.low = 0
 
         if len(data) > 0:
-            self.low, self.high = (np.min(data['low']), np.max(data['high']))
+            self.high = data['volume'].max()
         else:
-            self.low, self.high = (0, 1)
+
+            self.high = 1
         npic = len(self.pictures)
-        for (t, open, close, low, high) in data:
-            if t >= npic:
+        for index, row in data.iterrows():
+            if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
                 # 下跌绿色（实心）, 上涨红色（空心）
-                if close < open:  # 阴线情况
+                if row['close'] < row['open']:  # 阴线情况
                     p.setPen(pg.mkPen('g', width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush('g'))
-                    p.drawLine(QtCore.QPointF(t, low), QtCore.QPointF(t, high))  # 画上下影线                
-                    p.drawRect(QtCore.QRectF(t - w, open, w * 2, close - open))  # 画矩形，实心K线
+                    p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
 
-                elif close > open:  # 阳线情况
+                elif row['close'] > row['open']:  # 阳线情况
                     p.setPen(pg.mkPen('r', width=2))  # red
                     p.setBrush(pg.mkBrush('r'))  # red
-                    if (high != close):  # 如果最高点不等于收盘价，画上影线
-                        p.drawLine(QtCore.QPointF(t, high), QtCore.QPointF(t, close))
-                    if (low != open):  # 如果最低点不等于开盘价，画下影线
-                        p.drawLine(QtCore.QPointF(t, open), QtCore.QPointF(t, low))
 
                     # p.drawRect(QtCore.QRectF(i - w, open, w * 2, close - open)) # 如果画实心阳线，只需画个实心矩形即可
                     # 画空心阳线的时候，需要画四条线
 
-                    p.drawLine(QtCore.QPointF(t - w, open), QtCore.QPointF(t - w, close))  # 画单根K线的左边线
-                    p.drawLine(QtCore.QPointF(t + w, open), QtCore.QPointF(t + w, close))  # 画单根K线的右边线
-                    p.drawLine(QtCore.QPointF(t - w, close), QtCore.QPointF(t + w, close))  # 画单根K线的上边线
-                    p.drawLine(QtCore.QPointF(t - w, open), QtCore.QPointF(t + w, open))  # 画单根K线的下边线
+                    p.drawLine(QtCore.QPointF(index - w, 0), QtCore.QPointF(index - w, row['volume']))  # 画单根成交量柱线的左边线
+                    p.drawLine(QtCore.QPointF(index + w, 0), QtCore.QPointF(index + w, row['volume']))  # 画单根成交量柱线的右边线
+                    p.drawLine(QtCore.QPointF(index - w, row['volume']), QtCore.QPointF(index + w, row['volume']))  # 画单根成交量柱线的下边线
+                    p.drawLine(QtCore.QPointF(index - w, 0), QtCore.QPointF(index + w, 0))  # 画单根成交量柱线的上边线
 
                 else:  # 平盘情况
                     p.setPen(pg.mkPen('b', width=2))  # 十字线设为蓝色
                     p.setBrush(pg.mkBrush('b'))  # 十字线设为蓝色
 
-                    p.drawLine(QtCore.QPointF(t, high), QtCore.QPointF(t, low))  # 画上下影线
-                    p.drawLine(QtCore.QPointF(t - w, close), QtCore.QPointF(t + w, close))  # 画一条横线
+                    p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
 
                 p.end()
                 self.pictures.append(picture)
@@ -432,14 +417,6 @@ class VolumeItem(pg.GraphicsObject):
     def boundingRect(self):
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
 
-    # 计算y轴显示的范围
-    # ----------------------------------------------------------------------
-    def get_y_range(self, min_ix: int = None, max_ix: int = None) -> tuple[float, float]:
-
-        min_price = self.datas.loc[min_ix:max_ix].low.min()
-        max_price = self.datas.loc[min_ix:max_ix].high.max()
-
-        return min_price, max_price
 
 
 ########################################################################
@@ -450,11 +427,7 @@ class KLineWidget(KeyWraper):
     clsId = 0
 
     # 保存K线数据的列表和Numpy Array对象
-    listBar = []
-    listVol = []
-    listHigh = []
-    listLow = []
-    listSig = []
+
     listOpenInterest = []
     arrows = []
 
@@ -463,21 +436,7 @@ class KLineWidget(KeyWraper):
 
     # ----------------------------------------------------------------------
     def __init__(self, parent=None):
-        """Constructor"""
-        self.curveOI = None
-        self.pwInd = None
-        self.volume = None
-        self.pwVol = None
-        self.candle = None
-        self.plotItem = None
-        self.vb = None
-        self.pwKL = None
-        self.VboxL = None
-        self.crosshair = None
-        self.axisTime = None
-        self.pw = None
-        self.lay_KL = None
-        self.time_index = None
+
         self.parent = parent
         super(KLineWidget, self).__init__(parent)
 
@@ -490,10 +449,7 @@ class KLineWidget(KeyWraper):
 
         # 缓存数据
         self.datas = pd.DataFrame()
-        self.listBar = []
-        self.listVol = []
-        self.listHigh = []
-        self.listLow = []
+
         self.listSig = []
         self.listOpenInterest = []
         self.arrows = []
@@ -504,7 +460,7 @@ class KLineWidget(KeyWraper):
         self.sigColor = {}
         self.sigPlots = {}
 
-        # 所副图上信号图
+        # 所有副图上的信号图
         self.allSubColor = deque(['blue', 'green', 'yellow', 'white'])
         self.subSigData = {}
         self.subSigColor = {}
@@ -592,6 +548,7 @@ class KLineWidget(KeyWraper):
         self.pwKL.setMinimumHeight(350)
         self.pwKL.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
         self.pwKL.hideAxis('bottom')
+        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwKL_yRange)  # 子图的x轴范围改变信号
 
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwKL)
@@ -605,6 +562,9 @@ class KLineWidget(KeyWraper):
         self.pwVol.setMaximumHeight(150)
         self.pwVol.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
         self.pwVol.hideAxis('bottom')
+        self.pwVol.setContentsMargins(1,0,1,0)
+
+        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
 
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwVol)
@@ -612,13 +572,13 @@ class KLineWidget(KeyWraper):
     # ----------------------------------------------------------------------
     def initplotIndicators(self):  # 原函数名：initplotOI
         """初始化指标子图"""
-        self.pwInd = self.makePlotItem('_'.join([self.windowId, 'PlotInd']))
-        self.pwInd.setMaximumHeight(150)
-        self.pwInd.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.curveOI = self.pwInd.plot()
+        self.pwMACD = self.makePlotItem('_'.join([self.windowId, 'PlotInd']))
+        self.pwMACD.setMaximumHeight(150)
+        self.pwMACD.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
+        self.curveOI = self.pwMACD.plot()
 
         self.lay_KL.nextRow()
-        self.lay_KL.addItem(self.pwInd)
+        self.lay_KL.addItem(self.pwMACD)
 
     # ----------------------------------------------------------------------
     #  画图相关 
@@ -626,14 +586,14 @@ class KLineWidget(KeyWraper):
     def plotKline(self, redraw=False, xmin=0, xmax=-1):
         """重画K线子图"""
         if self.initCompleted:
-            self.candle.generatePicture(self.listBar[xmin:xmax], redraw)  # 画K线
+            self.candle.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画K线
             self.plotMark()  # 显示开平仓信号位置
 
     # ----------------------------------------------------------------------
     def plotVol(self, redraw=False, xmin=0, xmax=-1):
         """重画成交量子图"""
         if self.initCompleted:
-            self.volume.generatePicture(self.listVol[xmin:xmax], redraw)  # 画成交量子图
+            self.volume.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画成交量子图
 
     # ----------------------------------------------------------------------
     def PlotInd(self, xmin=0, xmax=-1):
@@ -641,7 +601,43 @@ class KLineWidget(KeyWraper):
         if self.initCompleted:
             self.curveOI.setData(np.append(self.listOpenInterest[xmin:xmax], 0), pen='w', name="OpenInterest")
 
-            # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+
+    def set_pwKL_yRange(self):      # 设置pwKL的y轴显示范围,该函数由sigXRangeChanged信号驱动
+        datas = self.datas
+        view = self.pwKL.getViewBox()
+        vRange = view.viewRange()
+        xmin = max(0, int(vRange[0][0]))
+        xmax = max(0, int(vRange[0][1]))
+        try:
+            xmax = min(xmax, len(datas) - 1)
+        except:
+            xmax = xmax
+        if len(datas) > 0 and xmax > xmin:
+            ymin = min(datas[xmin:xmax]['low'])
+            ymax = max(datas[xmin:xmax]['high'])
+            if ymin and ymax:
+                view.setRange(yRange=(ymin, ymax))
+            else:
+                pass
+        else:
+            view.setRange(yRange=(0, 1))
+
+    def set_pwVol_yRange(self):  # 设置pwVol的y轴显示范围,该函数由sigXRangeChanged信号驱动
+        datas = self.datas
+        view = self.pwVol.getViewBox()
+        vRange = view.viewRange()
+        xmin = max(0, int(vRange[0][0]))
+        xmax = max(0, int(vRange[0][1]))
+        try:
+            xmax = min(xmax, len(datas) - 1)
+        except:
+            xmax = xmax
+        if len(datas) > 0 and xmax > xmin:
+            ymax = max(datas[xmin:xmax]['volume'])
+            view.setRange(yRange=(0, ymax))
+        else:
+            view.setRange(yRange=(0, 1))
 
     def addSig(self, sig, main=True):
         """新增信号图"""
@@ -653,8 +649,8 @@ class KLineWidget(KeyWraper):
             self.allColor.append(self.allColor.popleft())
         else:
             if sig in self.subSigPlots:
-                self.pwInd.removeItem(self.subSigPlots[sig])
-            self.subSigPlots[sig] = self.pwInd.plot()
+                self.pwMACD.removeItem(self.subSigPlots[sig])
+            self.subSigPlots[sig] = self.pwMACD.plot()
             self.subSigColor[sig] = self.allSubColor[0]
             self.allSubColor.append(self.allSubColor.popleft())
 
@@ -737,44 +733,31 @@ class KLineWidget(KeyWraper):
         redraw ：False=重画最后一根K线; True=重画所有
         xMin,xMax : 数据范围
         """
-        # if xMax < 0:
-        #     xMax = len(self.datas) - 1
-        # else:
-        #     xMax
         xMax = len(self.datas) - 1 if xMax < 0 else xMax
-        # self.countK = xMax-xMin
-        # self.index = int((xMax+xMin)/2)
+
         self.pwKL.setLimits(xMin=xMin, xMax=xMax)
         self.pwVol.setLimits(xMin=xMin, xMax=xMax)
-        self.pwInd.setLimits(xMin=xMin, xMax=xMax)
+        self.pwMACD.setLimits(xMin=xMin, xMax=xMax)
         self.plotKline(redraw, xMin, xMax)  # K线图
         self.plotVol(redraw, xMin, xMax)  # K线副图，成交量
         self.PlotInd(0, len(self.datas))  # K线副图，指标
         self.refresh()
 
     # ----------------------------------------------------------------------
-    def get_item_y_range(self):
-        if self.candle:
-            self.candle.get_y_range()
 
     def refresh(self):
         """
         刷新三个子图的显示范围
         """
-        datas = self.datas
-        # minutes = int(self.countK / 2)
+        minutes = int(self.countK / 2)
+        xmin = max(0, self.index - minutes)
         try:
-            xmin = max(0, self.index - self.countK)
-            if self.datas:
-                xmax = min(xmin + self.countK, len(self.datas) - 1)
-            else:
-                xmax = xmin + self.countK
+            xmax = min(xmin + 2 * minutes, len(self.datas) - 1) if self.datas else xmin + 2 * minutes
         except:
-            xmax = xmin + self.countK
+            xmax = xmin + 2 * minutes
         self.pwKL.setRange(xRange=(xmin, xmax))
         self.pwVol.setRange(xRange=(xmin, xmax))
-        self.pwInd.setRange(xRange=(xmin, xmax))
-
+        self.pwMACD.setRange(xRange=(xmin, xmax))
     # ----------------------------------------------------------------------
     #  快捷键相关 
     # ----------------------------------------------------------------------
@@ -861,57 +844,6 @@ class KLineWidget(KeyWraper):
         xmax = max(0, int(vRange[0][1]))
         self.index = int((xmin + xmax) / 2) + 1
 
-    # ----------------------------------------------------------------------
-
-    def get_yaxis_range(self, datas):
-        """设置y轴范围"""
-        view = self.pwKL.getViewBox()
-        vRange = view.viewRange()
-        xmin = max(0, int(vRange[0][0]))
-        xmax = max(0, int(vRange[0][1]))
-        print('datas的类型是：', type(datas))
-        print('datas为', datas)
-        print('x的取值范围为:', xmin, xmax)
-        if len(datas) > 0 and xmax > xmin:
-            ymin = min(datas.loc[xmin:xmax]['low'])
-            print('y的最小值为:', ymin)
-            ymax = max(datas.loc[xmin:xmax]['high'])
-            print('y的最大值为:', ymax)
-
-        self.refresh()
-
-    def resignData(self, datas):
-        """更新数据，用于Y坐标自适应"""
-
-        # self.crosshair.datas = datas
-        def viewXRangeChanged(low, high):
-            vRange = view.viewRange()
-            xmin = max(0, int(vRange[0][0]))
-            xmax = max(0, int(vRange[0][1]))
-            xmax = min(xmax, len(datas))
-
-            if len(datas) > 0 and xmax > xmin:
-                ymin = min(datas.loc[xmin:xmax]['low'])
-                print('y的最小值为:', ymin)
-                ymax = max(datas.loc[xmin:xmax]['high'])
-                print('y的最大值为:', ymax)
-
-                if ymin == ymax:
-                    view.setRange(yRange=(-1, 1))
-                else:
-                    view.setRange(yRange=(ymin, ymax))
-
-            else:
-                view.setRange(yRange=(0, 1))
-
-        view = self.pwKL.getViewBox()
-        view.sigXRangeChanged.connect(partial(viewXRangeChanged, ('low', 'high')))
-
-        view = self.pwVol.getViewBox()
-        view.sigXRangeChanged.connect(partial(viewXRangeChanged, ('volume', 'volume')))
-
-        view = self.pwInd.getViewBox()
-        view.sigXRangeChanged.connect(partial(viewXRangeChanged, ('openInterest', 'openInterest')))
 
     # #----------------------------------------------------------------------
     # 数据相关
@@ -919,12 +851,7 @@ class KLineWidget(KeyWraper):
     def clearData(self):
         """清空数据"""
         # 清空数据，重新画图
-        self.time_index = []
-        self.listBar = []
-        self.listVol = []
-        self.listLow = []
-        self.listHigh = []
-        self.listOpenInterest = []
+
         self.listSig = []
         self.sigData = {}
         self.datas = None
@@ -940,7 +867,7 @@ class KLineWidget(KeyWraper):
             self.sigPlots = {}
         else:
             for sig in self.subSigPlots:
-                self.pwInd.removeItem(self.subSigPlots[sig])
+                self.pwMACD.removeItem(self.subSigPlots[sig])
             self.subSigData = {}
             self.subSigPlots = {}
 
@@ -1004,37 +931,15 @@ class KLineWidget(KeyWraper):
         return newBar
 
     # ----------------------------------------------------------------------
-    def loadData(self, datas, sigs=None):
+    def loadData(self, datas):
         """
         载入pandas.DataFrame数据
         datas : 数据格式，cols : datetime, open, close, low, high
         """
-        # 设置中心点时间
-        # 绑定数据，更新横坐标映射，更新Y轴自适应函数，更新十字光标映射
-        self.datas = datas
-        self.datas['time_int'] = np.array(range(len(self.datas.index)))
-        # for index, row in self.datas.iterrows():
-        #     row['times'] = tafunc.time_to_datetime(row['datetime'])
-        # self.datas['times'] = self.datas.strftime('%Y-%M-%D')
 
-        self.axisTime.xdict = {}
-        xdict = dict(enumerate(self.datas.datetime.tolist()))
-        self.axisTime.update_xdict(xdict)
-        # self.get_yaxis_range(self.datas)
-        # 更新画图用到的数据
-        self.listBar = self.datas[['time_int', 'open', 'close', 'low', 'high']].to_records(False)
-        self.listHigh = list(self.datas['high'])
-        self.listLow = list(self.datas['low'])
-        # self.listOpenInterest = list(datas['openInterest'])
-        self.listSig = [0] * (len(self.datas) - 1) if sigs is None else sigs
-        # 成交量颜色和涨跌同步，K线方向由涨跌决定
-        datas0 = pd.DataFrame()
-        datas0['open'] = self.datas.apply(lambda x: 0 if x['close'] >= x['open'] else x['volume'], axis=1)
-        datas0['close'] = self.datas.apply(lambda x: 0 if x['close'] < x['open'] else x['volume'], axis=1)
-        datas0['low'] = 0
-        datas0['high'] = self.datas['volume']
-        datas0['time_int'] = np.array(range(len(self.datas.index)))
-        self.listVol = datas0[['time_int', 'open', 'close', 'low', 'high']].to_records(False)
+        self.datas = datas
+
+
 
     # ----------------------------------------------------------------------
     def refreshAll(self, redraw=True, update=False):
