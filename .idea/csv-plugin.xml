@@ -3,27 +3,6 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="\DCE_i2209.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\RB9999.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\i2209_1min.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="\i2301_15min.csv">
           <value>
             <Attribute>
@@ -67,6 +46,13 @@
           </value>
         </entry>
         <entry key="\i2301_4hour.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\klines_data\i2301_1day.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -122,6 +108,7 @@
             </Attribute>
           </value>
         </entry>
+        <entry />
       </map>
     </option>
   </component>

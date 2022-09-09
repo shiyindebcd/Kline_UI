@@ -1103,9 +1103,11 @@ class KLineWidget(KeyWraper):
         mv_vol = MV(datas, 5, 20)
         macd = MACD(datas, 12, 26, 9)
 
-        data = pd.concat([datas, mv_vol, macd], axis=1)
-        self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
-        self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
+        self.datas = pd.concat([datas, mv_vol, macd], axis=1)
+
+        # data = pd.concat([datas, mv_vol, macd], axis=1)       #后面改过之后,传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行
+        # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
+        # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
         # print('传入的数据为: ', self.datas)
 
 

@@ -42,14 +42,14 @@ class MainWindows(QWidget, Ui_Form):
     def show_i_K_chart(self):
         self.Current_Species = 'i2301'
         self.show_candels(self.Current_Species,period='15min')
-        self.label_kline_info.setText(self.Current_Species + '_15min')
         self.UI_K_chart.refreshAll()
+        self.label_kline_info.setText(self.Current_Species + '_15min')
 
     def show_rb_K_chart(self):
         self.Current_Species = 'rb2210'
         self.show_candels(self.Current_Species, period='15min')
-        self.label_kline_info.setText(self.Current_Species + '_15min')
         self.UI_K_chart.refreshAll()
+        self.label_kline_info.setText(self.Current_Species + '_15min')
 
     def show_candels(self, Species, period):
         path ='./klines_data/' + Species + '_' + period + '.csv'
