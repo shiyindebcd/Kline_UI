@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from functools import partial
 from collections import deque
-from tqsdk.ta import MACD, PUBU
+from tqsdk.ta import PUBU, MV, MACD
 
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -233,21 +233,50 @@ class CandlestickItem(pg.GraphicsObject):
             self.high = data['high'].max()
         else:
             self.low, self.high = (0, 1)
+
+        pb1_cache = 0
+        pb2_cache = 0
+        pb3_cache = 0
+        pb4_cache = 0
+        pb5_cache = 0
+        pb6_cache = 0
+
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                # 下跌绿色（实心）, 上涨红色（空心）
+                if index > 0:               # 画六条瀑布线
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
+                    p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
+                    pb1_cache = row['pb1']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
+                    pb2_cache = row['pb2']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
+                    pb3_cache = row['pb3']
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
+                    pb4_cache = row['pb4']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
+                    pb5_cache = row['pb5']
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
+                    pb6_cache = row['pb6']
+
+                # 画蜡烛图,下跌绿色（实心）, 上涨红色（空心）
+
                 if row['close'] < row['open']:  # 阴线情况
-                    p.setPen(pg.mkPen('g', width=2))  # 设置画笔颜色，宽度
-                    p.setBrush(pg.mkBrush('g'))
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
+                    p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
                     p.drawLine(QtCore.QPointF(index, row['low']), QtCore.QPointF(index, row['high']))  # 画上下影线
                     p.drawRect(QtCore.QRectF(index - w, row['open'], w * 2, row['close'] - row['open']))  # 画矩形，实心K线
 
                 elif row['close'] > row['open']:  # 阳线情况
-                    p.setPen(pg.mkPen('r', width=2))  # red
-                    p.setBrush(pg.mkBrush('r'))  # red
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=2))  # red
+                    p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))  # red
                     if (row['high'] != row['close']):  # 如果最高点不等于收盘价，画上影线
                         p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['close']))
                     if (row['low'] != row['open']):  # 如果最低点不等于开盘价，画下影线
@@ -262,14 +291,16 @@ class CandlestickItem(pg.GraphicsObject):
                     p.drawLine(QtCore.QPointF(index - w, row['open']), QtCore.QPointF(index + w, row['open']))  # 画单根K线的下边线
 
                 else:  # 平盘情况
-                    p.setPen(pg.mkPen('b', width=2))  # 十字线设为蓝色
-                    p.setBrush(pg.mkBrush('b'))  # 十字线设为蓝色
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))  # 十字线时设为蓝色
+                    p.setBrush(pg.mkBrush(QtGui.QColor(0, 0, 255)))
 
                     p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['low']))  # 画上下影线
                     p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画一条横线
 
                 p.end()
                 self.pictures.append(picture)
+
+
 
     # 手动重画
     # ----------------------------------------------------------------------
@@ -345,26 +376,34 @@ class VolumeItem(pg.GraphicsObject):
             self.pictures.pop()
         w = 0.4  # k线一半的宽度
         self.low = 0
-
         if len(data) > 0:
             self.high = data['volume'].max()
         else:
-
             self.high = 1
+        mv1_cache = 0
+        mv2_cache = 0
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
+                if index > 0:
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))
+                    p.drawLine(QtCore.QPointF(index-1,mv1_cache), QtCore.QPointF(index, row['mv1']))
+                    mv1_cache = row['mv1']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width=2))
+                    p.drawLine(QtCore.QPointF(index-1, mv2_cache), QtCore.QPointF(index, row['mv2']))
+                    mv2_cache = row['mv2']
+
                 # 下跌绿色（实心）, 上涨红色（空心）
                 if row['close'] < row['open']:  # 阴线情况
-                    p.setPen(pg.mkPen('g', width=2))  # 设置画笔颜色，宽度
-                    p.setBrush(pg.mkBrush('g'))
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
+                    p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
                     p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
 
                 elif row['close'] > row['open']:  # 阳线情况
-                    p.setPen(pg.mkPen('r', width=2))  # red
-                    p.setBrush(pg.mkBrush('r'))  # red
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=2))  # red
+                    p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))  # red
 
                     # p.drawRect(QtCore.QRectF(i - w, open, w * 2, close - open)) # 如果画实心阳线，只需画个实心矩形即可
                     # 画空心阳线的时候，需要画四条线
@@ -375,8 +414,8 @@ class VolumeItem(pg.GraphicsObject):
                     p.drawLine(QtCore.QPointF(index - w, 0), QtCore.QPointF(index + w, 0))  # 画单根成交量柱线的上边线
 
                 else:  # 平盘情况
-                    p.setPen(pg.mkPen('b', width=2))  # 十字线设为蓝色
-                    p.setBrush(pg.mkBrush('b'))  # 十字线设为蓝色
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))  # 十字线设为蓝色
+                    p.setBrush(pg.mkBrush(QtGui.QColor(0, 0, 255)))  # 十字线设为蓝色
 
                     p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
 
@@ -446,7 +485,7 @@ class MACDItem(pg.GraphicsObject):
     # ----------------------------------------------------------------------
     def generatePicture(self, data=None, redraw=False):
         """重新生成图形对象"""
-        if redraw:          # 重画或者只更新最后一个K线
+        if redraw:          # 重画或者只更新最后一个周期的线
             self.pictures = []
         elif self.pictures:
             self.pictures.pop()
@@ -458,30 +497,30 @@ class MACDItem(pg.GraphicsObject):
             self.low, self.high = (0, 1)
 
         npic = len(self.pictures)
-        diff_cache = (self.high + self.low) / 2
-        dea_cache = (self.high + self.low) / 2
+        diff_cache = 0
+        dea_cache = 0
 
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:
-                    p.setPen(pg.mkPen('y', width=2))
+                if index > 0:                   # 画diff线和dea线
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
                     p.drawLine(QtCore.QPointF(index-1,diff_cache), QtCore.QPointF(index, row['diff']))
                     diff_cache = row['diff']
-                    p.setPen(pg.mkPen('w', width=2))
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 255), width=2))
                     p.drawLine(QtCore.QPointF(index-1, dea_cache), QtCore.QPointF(index, row['dea']))
                     dea_cache = row['dea']
 
-                if row['bar'] > 0:      # macd红柱
-                    p.setPen(pg.mkPen('r', width=6))  # 设置画笔颜色，宽度
-                    p.setBrush(pg.mkBrush('r'))
+                if row['bar'] > 0:      # macd 红柱
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=6))  # 设置画笔颜色，宽度
+                    p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))
                     p.drawLine(QtCore.QPointF(index, 0), QtCore.QPointF(index, row['bar']))
 
                 else:           # macd 绿柱
 
-                    p.setPen(pg.mkPen('g', width=6))
-                    p.setBrush(pg.mkBrush('g'))
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=6))
+                    p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
                     p.drawLine(QtCore.QPointF(index, 0), QtCore.QPointF(index, row['bar']))
 
                 p.end()
@@ -725,7 +764,7 @@ class KLineWidget(KeyWraper):
             xmax = xmax
         if len(datas) > 0 and xmax > xmin:
             ymax = max(datas[xmin:xmax]['volume'])
-            view.setRange(yRange=(0, ymax))
+            view.setRange(yRange=(ymax//13, ymax))
         else:
             view.setRange(yRange=(0, 1))
 
@@ -740,8 +779,8 @@ class KLineWidget(KeyWraper):
         except:
             xmax = xmax
         if len(datas) > 0 and xmax > xmin:
-            ymin = min(datas[xmin:xmax]['diff'])
-            ymax = max(datas[xmin:xmax]['diff'])
+            ymin = min(min(datas[xmin:xmax]['diff']), min(datas[xmin:xmax]['bar']))
+            ymax = max(max(datas[xmin:xmax]['diff']), max(datas[xmin:xmax]['bar']))
             if ymin and ymax:
                 view.setRange(yRange=(ymin, ymax))
             else:
@@ -1061,9 +1100,12 @@ class KLineWidget(KeyWraper):
         datas['pb4'] = pb4
         datas['pb5'] = pb5
         datas['pb6'] = pb6
+        mv_vol = MV(datas, 5, 20)
         macd = MACD(datas, 12, 26, 9)
 
-        self.datas = pd.concat([datas, macd], axis=1)
+        data = pd.concat([datas, mv_vol, macd], axis=1)
+        self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
+        self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
         # print('传入的数据为: ', self.datas)
 
 

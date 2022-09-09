@@ -281,7 +281,7 @@ QPushButton:pressed {
 </string>
                     </property>
                     <property name="text">
-                     <string/>
+                     <string>15min</string>
                     </property>
                    </widget>
                   </item>
@@ -613,21 +613,15 @@ QPushButton:pressed{
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_3">
                      <property name="spacing">
-                      <number>5</number>
+                      <number>3</number>
                      </property>
                      <property name="leftMargin">
                       <number>0</number>
                      </property>
-                     <property name="topMargin">
-                      <number>10</number>
-                     </property>
                      <property name="rightMargin">
                       <number>0</number>
                      </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_1min">
                        <property name="minimumSize">
                         <size>
@@ -667,7 +661,7 @@ QPushButton:pressed {
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_15min">
                        <property name="minimumSize">
                         <size>
@@ -707,7 +701,7 @@ QPushButton:pressed {
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_30min">
                        <property name="minimumSize">
                         <size>
@@ -747,7 +741,47 @@ QPushButton:pressed {
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
+                      <widget class="QPushButton" name="Btn_klines_1hour">
+                       <property name="minimumSize">
+                        <size>
+                         <width>30</width>
+                         <height>60</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>30</width>
+                         <height>60</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton {
+	color: rgb(255, 85, 0);	
+	font: 700 10pt &quot;等线&quot;;
+	border: 2px solid rgb(65, 51, 156);
+	border-radius: 10px;
+	background-color: rgb(20, 9, 70);
+	text-align: center;
+}
+
+QPushButton:hover {
+	border: 2px solid rgb(255, 85, 0);
+}
+
+QPushButton:pressed {
+	
+	color: rgb(255, 0, 0);
+}</string>
+                       </property>
+                       <property name="text">
+                        <string>1
+小
+时</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_2hour">
                        <property name="minimumSize">
                         <size>
@@ -787,7 +821,7 @@ QPushButton:pressed {
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_4hour">
                        <property name="minimumSize">
                         <size>
@@ -827,7 +861,7 @@ QPushButton:pressed {
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QPushButton" name="Btn_klines_daily">
                        <property name="minimumSize">
                         <size>
@@ -867,7 +901,7 @@ K
                        </property>
                       </widget>
                      </item>
-                     <item alignment="Qt::AlignHCenter">
+                     <item>
                       <widget class="QFrame" name="frame_22">
                        <property name="minimumSize">
                         <size>

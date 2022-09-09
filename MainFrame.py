@@ -349,9 +349,9 @@ class Ui_Form(object):
         self.frame_7.setFrameShape(QFrame.StyledPanel)
         self.frame_7.setFrameShadow(QFrame.Raised)
         self.verticalLayout_3 = QVBoxLayout(self.frame_7)
-        self.verticalLayout_3.setSpacing(5)
+        self.verticalLayout_3.setSpacing(3)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(0, 10, 0, 0)
+        self.verticalLayout_3.setContentsMargins(0, -1, 0, -1)
         self.Btn_klines_1min = QPushButton(self.frame_7)
         self.Btn_klines_1min.setObjectName(u"Btn_klines_1min")
         self.Btn_klines_1min.setMinimumSize(QSize(30, 60))
@@ -374,7 +374,7 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_1min, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_1min)
 
         self.Btn_klines_15min = QPushButton(self.frame_7)
         self.Btn_klines_15min.setObjectName(u"Btn_klines_15min")
@@ -398,7 +398,7 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_15min, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_15min)
 
         self.Btn_klines_30min = QPushButton(self.frame_7)
         self.Btn_klines_30min.setObjectName(u"Btn_klines_30min")
@@ -422,7 +422,31 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_30min, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_30min)
+
+        self.Btn_klines_1hour = QPushButton(self.frame_7)
+        self.Btn_klines_1hour.setObjectName(u"Btn_klines_1hour")
+        self.Btn_klines_1hour.setMinimumSize(QSize(30, 60))
+        self.Btn_klines_1hour.setMaximumSize(QSize(30, 60))
+        self.Btn_klines_1hour.setStyleSheet(u"QPushButton {\n"
+"	color: rgb(255, 85, 0);	\n"
+"	font: 700 10pt \"\u7b49\u7ebf\";\n"
+"	border: 2px solid rgb(65, 51, 156);\n"
+"	border-radius: 10px;\n"
+"	background-color: rgb(20, 9, 70);\n"
+"	text-align: center;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"	border: 2px solid rgb(255, 85, 0);\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"	\n"
+"	color: rgb(255, 0, 0);\n"
+"}")
+
+        self.verticalLayout_3.addWidget(self.Btn_klines_1hour)
 
         self.Btn_klines_2hour = QPushButton(self.frame_7)
         self.Btn_klines_2hour.setObjectName(u"Btn_klines_2hour")
@@ -446,7 +470,7 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_2hour, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_2hour)
 
         self.Btn_klines_4hour = QPushButton(self.frame_7)
         self.Btn_klines_4hour.setObjectName(u"Btn_klines_4hour")
@@ -470,7 +494,7 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_4hour, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_4hour)
 
         self.Btn_klines_daily = QPushButton(self.frame_7)
         self.Btn_klines_daily.setObjectName(u"Btn_klines_daily")
@@ -494,7 +518,7 @@ class Ui_Form(object):
 "	color: rgb(255, 0, 0);\n"
 "}")
 
-        self.verticalLayout_3.addWidget(self.Btn_klines_daily, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.Btn_klines_daily)
 
         self.frame_22 = QFrame(self.frame_7)
         self.frame_22.setObjectName(u"frame_22")
@@ -594,7 +618,7 @@ class Ui_Form(object):
         self.verticalLayout_14.addWidget(self.label_2)
 
 
-        self.verticalLayout_3.addWidget(self.frame_22, 0, Qt.AlignHCenter)
+        self.verticalLayout_3.addWidget(self.frame_22)
 
 
         self.horizontalLayout.addWidget(self.frame_7)
@@ -1378,7 +1402,7 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.Btn_draw_line_order.setText(QCoreApplication.translate("Form", u"\u753b\u7ebf\u4e0b\u5355", None))
-        self.label_kline_info.setText("")
+        self.label_kline_info.setText(QCoreApplication.translate("Form", u"15min", None))
         self.label_28.setText(QCoreApplication.translate("Form", u"\u6dfb\u52a0\u81ea\u9009\u5408\u7ea6:", None))
         self.comboBox_backtest_exchange.setItemText(0, QCoreApplication.translate("Form", u"\u5927\u5546\u6240 DCE", None))
         self.comboBox_backtest_exchange.setItemText(1, QCoreApplication.translate("Form", u"\u4e0a\u671f\u6240 SHFE", None))
@@ -1397,6 +1421,9 @@ class Ui_Form(object):
         self.Btn_klines_30min.setText(QCoreApplication.translate("Form", u"30\n"
 "\u5206\n"
 "\u949f", None))
+        self.Btn_klines_1hour.setText(QCoreApplication.translate("Form", u"1\n"
+"\u5c0f\n"
+"\u65f6", None))
         self.Btn_klines_2hour.setText(QCoreApplication.translate("Form", u"2\n"
 "\u5c0f\n"
 "\u65f6", None))
