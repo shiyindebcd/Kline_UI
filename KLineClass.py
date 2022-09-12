@@ -635,77 +635,100 @@ class KLineWidget(KeyWraper):
         self.initCompleted = True
 
     # ----------------------------------------------------------------------
-
-    def makePlotItem(self, name):
-        """生成PlotItem对象"""
-        self.vb = CustomViewBox()
-        self.plotItem = pg.PlotItem(viewBox=self.vb, name=name, axisItems=None)
-        # plotItem = pg.PlotItem(viewBox = vb, name=name ,axisItems={'bottom': self.axisTime})
-
-        self.plotItem.setMenuEnabled(False)  # 隐藏菜单
-        self.plotItem.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
-        self.plotItem.hideAxis('left')  # 隐藏左边坐标轴
-        self.plotItem.showAxis('right')  # 显示右边坐标轴
-
-        self.plotItem.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。
-        # 这种方法可以产生最好的数据可视化表示，但速度较慢。
-
-        self.plotItem.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
-        self.plotItem.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
-        self.plotItem.showGrid(True, True)  # 显示网格
-        self.plotItem.setMinimumHeight(80)  # 图项最小高度
-        self.plotItem.hideButtons()  # 隐藏刻度按钮
-        # plotItem.setMouseEnabled(x=True, y=True)                       # 禁止鼠标拖动
-        # self.plotItem.getAxis('right').setStyle(tickFont=QFont("Roman times", 10, QFont.Bold))  # 设置右边坐标轴刻度字体
-        # self.plotItem.getAxis('bottom').setStyle(tickFont=QFont("Roman times", 10, QFont.Bold))  # 设置下边坐标轴刻度字体
-        self.plotItem.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
-        self.plotItem.getAxis('bottom').setPen(QtGui.QColor(255, 0, 0))  # x轴颜色
-        self.plotItem.getAxis('right').setTextPen(QtGui.QColor(150, 150, 150))  # y轴刻度颜色
-        self.plotItem.getAxis('bottom').setTextPen(QtGui.QColor(150, 150, 150))  # x轴刻度颜色
-
-        return self.plotItem
-
-    # ----------------------------------------------------------------------
     def initplotKline(self):
         """初始化蜡烛图子图"""
-        self.pwKL = self.makePlotItem('_'.join([self.windowId, 'PlotKL']))
-        self.candle = CandlestickItem(self.datas)
-        self.pwKL.addItem(self.candle)
-        self.pwKL.setMinimumHeight(350)
+        vb = CustomViewBox()
+        self.pwKL = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotKL'])), axisItems=None)
         self.pwKL.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.pwKL.hideAxis('bottom')
         self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwKL_yRange)  # 子图的x轴范围改变信号
+        self.pwKL.setMenuEnabled(False)  # 隐藏菜单
+        self.pwKL.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
+        self.pwKL.hideAxis('left')  # 隐藏左边坐标轴
+        self.pwKL.showAxis('right')  # 显示右边坐标轴
+        # self.pwKL.hideAxis('bottom')
 
+        self.pwKL.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。# 这种方法可以产生最好的数据可视化表示，但速度较慢。
+        self.pwKL.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
+        self.pwKL.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
+        self.pwKL.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
+        self.pwKL.setMaximumHeight(800)  # 图项最大高度
+        self.pwKL.setMinimumHeight(350)   # 图项最小高度
+        self.pwKL.hideButtons()  # 隐藏刻度按钮
+        self.pwKL.setZValue(0)
+        self.pwKL.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
+        self.pwKL.getAxis('bottom').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置下边坐标轴刻度字体
+        self.pwKL.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
+        self.pwKL.getAxis('bottom').setPen(QtGui.QColor(255, 0, 0))  # x轴颜色
+        self.pwKL.getAxis('right').setTextPen(QtGui.QColor(150, 150, 150))  # y轴刻度颜色
+        self.pwKL.getAxis('bottom').setTextPen(QtGui.QColor(150, 150, 150))  # x轴刻度颜色
+
+        self.candle = CandlestickItem(self.datas)
+        self.candle.setZValue(10)
+        self.pwKL.addItem(self.candle)
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwKL)
 
     # ----------------------------------------------------------------------
     def initplotVol(self):
         """初始化成交量子图"""
-        self.pwVol = self.makePlotItem('_'.join([self.windowId, 'PlotVOL']))
+        vb = CustomViewBox()
+        self.pwVol = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotVol'])), axisItems=None)
+        self.pwVol.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
+        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
+        self.pwVol.setMenuEnabled(False)  # 隐藏菜单
+        self.pwVol.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
+        self.pwVol.hideAxis('left')  # 隐藏左边坐标轴
+        self.pwVol.showAxis('right')  # 显示右边坐标轴
+        # self.pwKL.hideAxis('bottom')
+
+        self.pwVol.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。# 这种方法可以产生最好的数据可视化表示，但速度较慢。
+        self.pwVol.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
+        self.pwVol.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
+        self.pwVol.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
+        self.pwVol.setMinimumHeight(80)  # 图项最小高度
+        self.pwVol.setMaximumHeight(150)  # 图项最大高度
+        self.pwVol.hideButtons()  # 隐藏刻度按钮
+        self.pwVol.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
+        self.pwVol.getAxis('bottom').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置下边坐标轴刻度字体
+        self.pwVol.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
+        self.pwVol.getAxis('bottom').setPen(QtGui.QColor(255, 0, 0))  # x轴颜色
+        self.pwVol.getAxis('right').setTextPen(QtGui.QColor(150, 150, 150))  # y轴刻度颜色
+        self.pwVol.getAxis('bottom').setTextPen(QtGui.QColor(150, 150, 150))  # x轴刻度颜色
+
         self.volume = VolumeItem(self.datas)
         self.pwVol.addItem(self.volume)
-        self.pwVol.setMaximumHeight(150)
-        self.pwVol.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.pwVol.hideAxis('bottom')
-        self.pwVol.setContentsMargins(1,0,1,0)
-
-        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
-
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwVol)
 
     # ----------------------------------------------------------------------
     def initplotMACD(self):
         """初始化MACD子图"""
-        self.pwMACD = self.makePlotItem('_'.join([self.windowId, 'PlotMACD']))
+        vb = CustomViewBox()
+        self.pwMACD = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotMACD'])), axisItems=None)
+        self.pwMACD.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
+        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwMACD_yRange)  # 子图的x轴范围改变信号
+        self.pwMACD.setMenuEnabled(False)  # 隐藏菜单
+        self.pwMACD.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
+        self.pwMACD.hideAxis('left')  # 隐藏左边坐标轴
+        self.pwMACD.showAxis('right')  # 显示右边坐标轴
+        # self.pwMACD.hideAxis('bottom')
+
+        self.pwMACD.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。# 这种方法可以产生最好的数据可视化表示，但速度较慢。
+        self.pwMACD.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
+        self.pwMACD.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
+        self.pwMACD.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
+        self.pwMACD.setMinimumHeight(80)  # 图项最小高度
+        self.pwMACD.setMaximumHeight(150)  # 图项最大高度
+        self.pwMACD.hideButtons()  # 隐藏刻度按钮
+        self.pwMACD.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
+        self.pwMACD.getAxis('bottom').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置下边坐标轴刻度字体
+        self.pwMACD.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
+        self.pwMACD.getAxis('bottom').setPen(QtGui.QColor(255, 0, 0))  # x轴颜色
+        self.pwMACD.getAxis('right').setTextPen(QtGui.QColor(150, 150, 150))  # y轴刻度颜色
+        self.pwMACD.getAxis('bottom').setTextPen(QtGui.QColor(150, 150, 150))  # x轴刻度颜色
+
         self.macd = MACDItem(self.datas)
         self.pwMACD.addItem(self.macd)
-        self.pwMACD.setMaximumHeight(150)
-        self.pwMACD.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.pwKL.hideAxis('bottom')
-        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwMACD_yRange)  # 子图的x轴范围改变信号
-
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwMACD)
 
@@ -885,7 +908,10 @@ class KLineWidget(KeyWraper):
         redraw ：False=重画最后一根K线; True=重画所有
         xMin,xMax : 数据范围
         """
-        xMax = len(self.datas) - 1 if xMax < 0 else xMax
+        if xMax < 0:
+            xMax = len(self.datas) - 1
+        else:
+            xMax = xMax
 
         self.pwKL.setLimits(xMin=xMin, xMax=xMax)
         self.pwVol.setLimits(xMin=xMin, xMax=xMax)
@@ -896,20 +922,41 @@ class KLineWidget(KeyWraper):
         self.refresh()
 
     # ----------------------------------------------------------------------
+    #
+    # def refresh(self):
+    #     """
+    #     刷新三个子图的显示范围
+    #     """
+    #     minutes = int(self.countK / 2)
+    #     xmin = max(0, self.index - minutes)
+    #     try:
+    #         xmax = min(xmin + 2 * minutes, len(self.datas) - 1) if self.datas else xmin + 2 * minutes
+    #     except:
+    #         xmax = xmin + 2 * minutes
+    #     self.pwKL.setRange(xRange=(xmin, xmax))
+    #     self.pwVol.setRange(xRange=(xmin, xmax))
+    #     self.pwMACD.setRange(xRange=(xmin, xmax))
+    #
 
     def refresh(self):
         """
         刷新三个子图的显示范围
         """
+        datas = self.datas
         minutes = int(self.countK / 2)
         xmin = max(0, self.index - minutes)
         try:
-            xmax = min(xmin + 2 * minutes, len(self.datas) - 1) if self.datas else xmin + 2 * minutes
+            if datas:
+                xmax = min(xmin + 2 * minutes, len(datas) - 1)
+            else:
+                xmax = xmin + 2 * minutes
         except:
             xmax = xmin + 2 * minutes
         self.pwKL.setRange(xRange=(xmin, xmax))
         self.pwVol.setRange(xRange=(xmin, xmax))
         self.pwMACD.setRange(xRange=(xmin, xmax))
+
+
     # ----------------------------------------------------------------------
     #  快捷键相关 
     # ----------------------------------------------------------------------
