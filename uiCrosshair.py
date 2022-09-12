@@ -11,7 +11,7 @@ from PySide6 import QtGui, QtCore
 from pyqtgraph.Point import Point
 
 ########################################################################
-# 十字光标支持
+# 十字光标类
 ########################################################################
 class Crosshair(QtCore.QObject):
     """
