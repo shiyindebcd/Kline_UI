@@ -11,6 +11,7 @@ from PySide6.QtWidgets import *
 from PySide6 import QtGui, QtCore
 
 from uiCrosshair import Crosshair
+# from ChartCrossgair import ChartCursor
 import pyqtgraph as pg
 
 
@@ -107,9 +108,9 @@ class CustomViewBox(pg.ViewBox):
         pg.ViewBox.__init__(self, *args, **kwds)
 
 
-    def mouseClickEvent(self, ev):    ## 右键自适应
-        if ev.button() == QtCore.Qt.RightButton:
-            self.autoRange()
+    # def mouseClickEvent(self, ev):    ## 右键自适应
+    #     if ev.button() == QtCore.Qt.RightButton:
+    #         self.autoRange()
 
 
 ########################################################################
@@ -271,6 +272,7 @@ class CandlestickItem(pg.GraphicsObject):
     def boundingRect(self):    # 定义边界
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
 
+
 ########################################################################
 # 成交量图形对象
 ########################################################################
@@ -371,7 +373,6 @@ class VolumeItem(pg.GraphicsObject):
 
     def boundingRect(self):    # 定义边界
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
-
 
 
 ########################################################################
@@ -478,6 +479,7 @@ class KLineWidget(KeyWraper):
     arrows = []
     initCompleted = False       # 是否完成了历史数据的读取标志
 
+
     def __init__(self, parent=None):
 
         self.parent = parent
@@ -535,6 +537,7 @@ class KLineWidget(KeyWraper):
         self.initplotMACD()  # 指标子图
         # 注册十字光标
         self.crosshair = Crosshair(self.pw, self)
+        # self.crossgair = ChartCursor(self, self.datas, self,pwKL,  )
         # 设置界面
         self.VboxL = QVBoxLayout()  # 垂直布局
         self.VboxL.setContentsMargins(0, 0, 0, 0)  # Vboxlayout的外边距要去掉,这个非常难找
@@ -569,7 +572,6 @@ class KLineWidget(KeyWraper):
         # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
         # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
         # print('传入的数据为: ', self.datas)
-
 
     def initplotKline(self):
         """初始化蜡烛图子图"""
@@ -609,12 +611,12 @@ class KLineWidget(KeyWraper):
         vb = CustomViewBox()
         self.pwVol = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotVol'])), axisItems=None)
         self.pwVol.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
+        self.pwVol.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
         self.pwVol.setMenuEnabled(False)  # 隐藏菜单
         self.pwVol.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
         self.pwVol.hideAxis('left')  # 隐藏左边坐标轴
         self.pwVol.showAxis('right')  # 显示右边坐标轴
-        # self.pwKL.hideAxis('bottom')
+        self.pwVol.hideAxis('bottom')
 
         self.pwVol.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。# 这种方法可以产生最好的数据可视化表示，但速度较慢。
         self.pwVol.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
@@ -641,12 +643,12 @@ class KLineWidget(KeyWraper):
         vb = CustomViewBox()
         self.pwMACD = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotMACD'])), axisItems=None)
         self.pwMACD.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
-        self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwMACD_yRange)  # 子图的x轴范围改变信号
+        self.pwMACD.getViewBox().sigXRangeChanged.connect(self.set_pwMACD_yRange)  # 子图的x轴范围改变信号
         self.pwMACD.setMenuEnabled(False)  # 隐藏菜单
         self.pwMACD.setClipToView(True)  # 在ViewBox可见范围内绘制所有数据
         self.pwMACD.hideAxis('left')  # 隐藏左边坐标轴
         self.pwMACD.showAxis('right')  # 显示右边坐标轴
-        # self.pwMACD.hideAxis('bottom')
+        self.pwMACD.hideAxis('bottom')
 
         self.pwMACD.setDownsampling(mode='peak')  # 缩减像素采样,峰值:通过画一个跟随原始数据的最小值和最大值的锯齿波向下采样。# 这种方法可以产生最好的数据可视化表示，但速度较慢。
         self.pwMACD.setRange(xRange=(0, 1), yRange=(0, 1))  # 设置x、y轴范围
@@ -799,8 +801,8 @@ class KLineWidget(KeyWraper):
             # 卖信号
             elif self.listSig[i] < 0:
                 arrow = pg.ArrowItem(pos=(i, self.datas[i]['high']), angle=-90, brush=(0, 255, 0))
-            self.pwKL.addItem(arrow)
-            self.arrows.append(arrow)
+            # self.pwKL.addItem(arrow)
+            # self.arrows.append(arrow)
     # ----------------------------------------------------------------------
     #  界面刷新相关
     # ----------------------------------------------------------------------
@@ -810,10 +812,11 @@ class KLineWidget(KeyWraper):
         """
         # 调用画图函数
         self.index = len(self.datas)
+        self.crosshair.datas = self.datas
         self.plotAll(redraw, 0, len(self.datas))
         if not update:
             self.updateAll()
-        self.crosshair.signal.emit((None, None))
+        # self.crosshair.signal.emit((None, None))
 
     def plotAll(self, redraw=True, xMin=0, xMax=-1):
         """
@@ -996,12 +999,12 @@ class KLineWidget(KeyWraper):
         self.listSig = sig
         self.plotMark()
 
-    def onBar(self, bar):
+    def onBar(self, bar:dict):
         """
         新增K线数据,K线播放模式
         """
         # 是否需要更新K线
-        if len(self.datas) > 0 and bar.datetime == self.datas[-1].datetime:
+        if len(self.datas) > 0 and bar['datetime'] == self.datas.loc[-1].datetime:
             newBar = False
         else:
             newBar = True
@@ -1011,15 +1014,10 @@ class KLineWidget(KeyWraper):
         else:
             nrecords = len(self.datas) - 1
 
-        if bar.openInterest == np.inf or bar.openInterest == -np.inf:
-            bar.openInterest = np.random.randint(0, 3)
+        if bar['close'] < bar['open']:
+            recordVol = (nrecords, abs(bar['volume']), 0, 0, abs(bar['volume']))
         else:
-            bar.openInterest
-
-        if bar.close < bar.open:
-            recordVol = (nrecords, abs(bar.volume), 0, 0, abs(bar.volume))
-        else:
-            recordVol = (nrecords, 0, abs(bar.volume), 0, abs(bar.volume))
+            recordVol = (nrecords, 0, abs(bar['volume']), 0, abs(bar['volume']))
 
         if newBar and any(self.datas):
             self.datas.resize(nrecords + 1, refcheck=0)
@@ -1030,13 +1028,13 @@ class KLineWidget(KeyWraper):
             self.listHigh.pop()
             self.listOpenInterest.pop()
         if any(self.datas):
-            self.datas[-1] = (bar.datetime, bar.open, bar.close, bar.low, bar.high, bar.volume, bar.openInterest)
-            self.listBar[-1] = (nrecords, bar.open, bar.close, bar.low, bar.high)
+            self.datas.loc[-1] = (bar['datetime'], bar['open'], bar['close'], bar['low'], bar['high'], bar['volume'], bar['openInterest'])
+            self.listBar[-1] = (nrecords, bar['open'], bar['close'], bar['low'], bar['high'])
             self.listVol[-1] = recordVol
         else:
-            self.datas = np.rec.array([(bar.datetime, bar.open, bar.close, bar.low, bar.high, bar.volume, bar.openInterest)],
+            self.datas = np.rec.array([(bar['datetime'], bar['open'], bar['close'], bar['low'], bar['high'], bar['volume'], bar['openInterest'])],
                                       names=('datetime', 'open', 'close', 'low', 'high', 'volume', 'openInterest'))
-            self.listBar = np.rec.array([(nrecords, bar.open, bar.close, bar.low, bar.high)],
+            self.listBar = np.rec.array([(nrecords, bar['open'], bar['close'], bar['low'], bar['high'])],
                                         names=('time_int', 'open', 'close', 'low', 'high'))
             self.listVol = np.rec.array([recordVol], names=('time_int', 'open', 'close', 'low', 'high'))
             self.get_yaxis_range(self.datas)
@@ -1046,5 +1044,7 @@ class KLineWidget(KeyWraper):
         self.listHigh.append(bar.high)
         self.listOpenInterest.append(bar.openInterest)
         self.get_yaxis_range(self.datas)
+
         return newBar
+
 
