@@ -14,7 +14,7 @@ class Crosshair(QtCore.QObject):
     """
     此类给pg.PlotWidget()添加crossHair功能,PlotWidget实例需要初始化时传入
     """
-    signal = QtCore.Signal()
+    signal = QtCore.Signal(float, float)
     signalInfo = QtCore.Signal(float, float)
 
 
@@ -27,9 +27,6 @@ class Crosshair(QtCore.QObject):
 
         self.xAxis = 0
         self.yAxis = 0
-
-        self.datas = None
-
         self.yAxises = [0 for i in range(3)]
         self.leftX = [0 for i in range(3)]
         self.showHLine = [False for i in range(3)]
@@ -74,17 +71,16 @@ class Crosshair(QtCore.QObject):
         self.signal.connect(self.update)
         self.signalInfo.connect(self.plotInfo)
 
-    # ----------------------------------------------------------------------
-    def update(self, pos):
+    def update(self, x, y):
         """刷新界面显示"""
-        print('运行到这里了')
-        xAxis, yAxis = pos
-        xAxis, yAxis = (self.xAxis, self.yAxis) if xAxis is None else (xAxis, yAxis)
+        xAxis = x
+        yAxis = y
+        if xAxis is None:
+            xAxis, yAxis = (self.xAxis, self.yAxis)
+        else:
+            xAxis, yAxis = (x, y)
         self.moveTo(xAxis, yAxis)
-        # self.rects = [self.views[i].sceneBoundingRect() for i in range(3)]
 
-        # self.set_pos()
-    # ----------------------------------------------------------------------
     def __mouseMoved(self, evt):
         """鼠标移动回调"""
         pos = evt[0]
@@ -114,7 +110,6 @@ class Crosshair(QtCore.QObject):
         self.plotInfo(xAxis, yAxis)
         self.master.candle.update()
 
-
     def vhLinesSetXY(self, xAxis, yAxis):
         """水平和竖线位置设置"""
         for i in range(3):
@@ -125,8 +120,6 @@ class Crosshair(QtCore.QObject):
             else:
                 self.hLines[i].hide()
 
-
-    # ----------------------------------------------------------------------
     def plotInfo(self, xAxis, yAxis):
         """
         被嵌入的plotWidget在需要的时候通过调用此方法显示K线信息
@@ -169,8 +162,6 @@ class Crosshair(QtCore.QObject):
             datetimeText = ""
             dateText = ""
             timeText = ""
-
-
 
         # 显示高开低收及日期
         # 和上一个收盘价比较，决定K线信息的字符颜色
@@ -223,7 +214,6 @@ class Crosshair(QtCore.QObject):
                                 <span style="color: rgb(255,0,127);  font-size: 14px;">  bar: %.1f   </span>'
                                       '</div>' % (diff, dea, bar))
 
-
         # 坐标轴宽度
         rightAxisWidth = self.views[0].getAxis('right').width()
         bottomAxisHeight = self.views[2].getAxis('bottom').height()
@@ -248,7 +238,6 @@ class Crosshair(QtCore.QObject):
         self.__text_Volume_Info.setPos(tl[0].x(), tl[1].y())
         self.__text_MACD_Info.setPos(tl[0].x(), tl[2].y())
 
-
         # 修改对称方式防止遮挡
         if xAxis > self.master.index:
             self.__text_X_date.setPos(xAxis, br[2].y())
@@ -265,19 +254,13 @@ class Crosshair(QtCore.QObject):
             self.text_Y_volume[0].setPos(tl[0].x(), yAxis)
             self.text_Y_volume[0].anchor = Point(0, 1)
 
-
         # 显示Y轴价格
 
         self.text_Y_volume[0].setHtml('<div style="text-align: right">\
                      <span style="color: yellow; font-size: 16px;">%0.1f</span>\
-                        </div>' % (yAxis ))
+                        </div>' % (yAxis))
 
         # 显示X轴时间
         self.__text_X_date.setHtml('<div style="text-align: center">\
                                 <span style="color: yellow; font-size: 16px;">%s</span>\
                                 </div>' % (datetimeText))
-
-
-
-
-

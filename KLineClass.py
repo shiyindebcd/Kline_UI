@@ -1,41 +1,34 @@
 # -*- coding: utf-8 -*-
 
+from collections import deque
+from datetime import datetime
+from typing import List
+
 import numpy as np
 import pandas as pd
-from datetime import datetime
-from functools import partial
-from collections import deque
-from typing import List, Dict, Type, Tuple
-from tqsdk.ta import PUBU, MV, MACD
-
+import pyqtgraph as pg
+from PySide6 import QtCore, QtGui
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from PySide6 import QtGui, QtCore
+from tqsdk.ta import MACD, MV, PUBU
 
 from uiCrosshair import Crosshair
-# from ChartCrossgair import ChartCursor
-import pyqtgraph as pg
 
-
-# 字符串转换
-# ---------------------------------------------------------------------------------------
-# try:
-#     _fromUtf8 = QtCore.QString.fromUtf8
-# except AttributeError:
-#     def _fromUtf8(s):
-#         return s
 
 ########################################################################
 # 键盘鼠标功能
 ########################################################################
 class KeyWraper(QWidget):
     """键盘鼠标功能支持的元类"""
-    def __init__(self, parent=None):    # 初始化
+
+
+    def __init__(self, parent=None):  # 初始化
         QWidget.__init__(self, parent)
         self.setMouseTracking(True)  # 设置鼠标跟踪
         self.autoFillBackground()
 
-    def keyPressEvent(self, event):    # 重载方法keyPressEvent(self,event),即按键按下事件方法
+
+    def keyPressEvent(self, event):  # 重载方法keyPressEvent(self,event),即按键按下事件方法
         if event.key() == QtCore.Qt.Key_Up:
             self.onUp()
         elif event.key() == QtCore.Qt.Key_Down:
@@ -49,57 +42,73 @@ class KeyWraper(QWidget):
         elif event.key() == QtCore.Qt.Key_PageDown:
             self.onNxt()
 
-    def mousePressEvent(self, event):    # 重载方法mousePressEvent(self,event),即鼠标点击事件方法
+
+    def mousePressEvent(self, event):  # 重载方法mousePressEvent(self,event),即鼠标点击事件方法
         if event.button() == QtCore.Qt.RightButton:
             self.onRClick(event.pos())
         elif event.button() == QtCore.Qt.LeftButton:
             self.onLClick(event.pos())
 
-    def mouseRelease(self, event):    # 重载方法mouseReleaseEvent(self,event),即鼠标点击事件方法
+
+    def mouseRelease(self, event):  # 重载方法mouseReleaseEvent(self,event),即鼠标点击事件方法
         if event.button() == QtCore.Qt.RightButton:
             self.onRRelease(event.pos())
         elif event.button() == QtCore.Qt.LeftButton:
             self.onLRelease(event.pos())
         self.releaseMouse()
 
-    def wheelEvent(self, event):    # 重载方法wheelEvent(self,event),即滚轮事件方法
+
+    def wheelEvent(self, event):  # 重载方法wheelEvent(self,event),即滚轮事件方法
         return
+
 
     def paintEvent(self, event):  # 重载方法paintEvent(self,event),即拖动事件方法
         self.onPaint()
 
-    def onNxt(self):    # PgDown键
+
+    def onNxt(self):  # PgDown键
         pass
 
-    def onPre(self):    # PgUp键
+
+    def onPre(self):  # PgUp键
         pass
 
-    def onUp(self):    # 向上键和滚轮向上
+
+    def onUp(self):  # 向上键和滚轮向上
         pass
 
-    def onDown(self):   # 向下键和滚轮向下
+
+    def onDown(self):  # 向下键和滚轮向下
         pass
 
-    def onLeft(self):    # 向左键
+
+    def onLeft(self):  # 向左键
         pass
 
-    def onRight(self):   # 向右键
+
+    def onRight(self):  # 向右键
         pass
 
-    def onLClick(self, pos):    # 鼠标左单击
+
+    def onLClick(self, pos):  # 鼠标左单击
         pass
 
-    def onRClick(self, pos):    # 鼠标右单击
+
+    def onRClick(self, pos):  # 鼠标右单击
         pass
 
-    def onLRelease(self, pos):    # 鼠标左释放
+
+    def onLRelease(self, pos):  # 鼠标左释放
         pass
 
-    def onRRelease(self, pos):    # 鼠标右释放
+
+    def onRRelease(self, pos):  # 鼠标右释放
         pass
 
-    def onPaint(self):   # 画图
+
+    def onPaint(self):  # 画图
         pass
+
 
 ########################################################################
 # 时间序列，横坐标支持
@@ -110,8 +119,8 @@ class DatetimeAxis(pg.AxisItem):
         super().__init__(*args, **kwargs)
 
         self.data = datas  # 传入k线数据
-        self.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=1))  #  设置时间轴边框颜色
-        self.tickFont = QtGui.QFont("Arial", 6)  # 刻度字体
+        self.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=1))  # 设置时间轴边框颜色
+        self.tickFont = QtGui.QFont("Arial", 6)  # 时间轴刻度字体
 
 
     def tickStrings(self, values: List[int], scale: float, spacing: int):
@@ -133,12 +142,7 @@ class DatetimeAxis(pg.AxisItem):
                 else:
                     s = dt.strftime("%Y-%m-%d")
             strings.append(s)
-
         return strings
-
-
-    def clear_all(self) -> None:
-        self._barmanager.clear()
 
 
 ########################################################################
@@ -146,7 +150,9 @@ class DatetimeAxis(pg.AxisItem):
 ########################################################################
 class CandlestickItem(pg.GraphicsObject):
     """K线图形对象"""
-    def __init__(self, data: pd.DataFrame):    # 初始化
+
+
+    def __init__(self, data: pd.DataFrame):  # 初始化
         pg.GraphicsObject.__init__(self)
 
         self.data = data
@@ -161,11 +167,12 @@ class CandlestickItem(pg.GraphicsObject):
         self.high = 1
         self.picture = QtGui.QPicture()
         self.pictures = []
-        self.generatePicture(self.data)        # 刷新K线
+        self.generatePicture(self.data)  # 刷新K线
 
-    def generatePicture(self, data=None, redraw=False):        # 画K线
+
+    def generatePicture(self, data=None, redraw=False):  # 画K线
         """重新生成图形对象"""
-        if redraw:        # 重画或者只更新最后一个K线
+        if redraw:  # 重画或者只更新最后一个K线
             self.pictures = []
         elif self.pictures:
             self.pictures.pop()
@@ -177,40 +184,39 @@ class CandlestickItem(pg.GraphicsObject):
         else:
             self.low, self.high = (0, 1)
 
-        # pb1_cache = 0
-        # pb2_cache = 0
-        # pb3_cache = 0
-        # pb4_cache = 0
-        # pb5_cache = 0
-        # pb6_cache = 0
+        pb1_cache = 0
+        pb2_cache = 0
+        pb3_cache = 0
+        pb4_cache = 0
+        pb5_cache = 0
+        pb6_cache = 0
 
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                # if index > 0:               # 画六条瀑布线
-                    # p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
-                    # p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
-                    # pb1_cache = row['pb1']
-                    # p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
-                    # p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
-                    # pb2_cache = row['pb2']
-                    # p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
-                    # p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
-                    # pb3_cache = row['pb3']
-                    # p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
-                    # p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
-                    # pb4_cache = row['pb4']
-                    # p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
-                    # p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
-                    # pb5_cache = row['pb5']
-                    # p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width = 2))
-                    # p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
-                    # pb6_cache = row['pb6']
+                if index > 0:               # 画六条瀑布线
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
+                    p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
+                    pb1_cache = row['pb1']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
+                    pb2_cache = row['pb2']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
+                    pb3_cache = row['pb3']
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
+                    pb4_cache = row['pb4']
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
+                    pb5_cache = row['pb5']
+                    p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width = 2))
+                    p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
+                    pb6_cache = row['pb6']
 
                 # 画蜡烛图,下跌绿色（实心）, 上涨红色（空心）
-
                 if row['close'] < row['open']:  # 阴线情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
@@ -241,15 +247,15 @@ class CandlestickItem(pg.GraphicsObject):
                     p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画一条横线
 
                 p.end()
-                self.pictures.append(picture)
-        # p = QtGui.QPainter(picture)
-        # p.drawLines()
+                self.pictures.append(picture)  # p = QtGui.QPainter(picture)  # p.drawLines()
 
-    def update(self):    # 手动重画
+
+    def update(self):  # 手动重画
         if not self.scene() is None:
             self.scene().update()
 
-    def paint(self, painter, opt, w):    # 自动重画
+
+    def paint(self, painter, opt, w):  # 自动重画
         rect = opt.exposedRect
         xmin, xmax = (max(0, int(rect.left())), min(int(len(self.pictures)), int(rect.right())))
         if not self.rect == (rect.left(), rect.right()) or self.picture is None:
@@ -259,14 +265,16 @@ class CandlestickItem(pg.GraphicsObject):
         elif not self.picture is None:
             self.picture.play(painter)
 
-    def createPic(self, xmin, xmax):    # 缓存图片
+
+    def createPic(self, xmin, xmax):  # 缓存图片
         picture = QPicture()
         p = QPainter(picture)
         [pic.play(p) for pic in self.pictures[xmin:xmax]]
         p.end()
         return picture
 
-    def boundingRect(self):    # 定义边界
+
+    def boundingRect(self):  # 定义边界
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
 
 
@@ -276,22 +284,24 @@ class CandlestickItem(pg.GraphicsObject):
 class VolumeItem(pg.GraphicsObject):
     """K线图形对象"""
 
-    def __init__(self, data: pd.DataFrame):    # 初始化
+
+    def __init__(self, data: pd.DataFrame):  # 初始化
         """初始化"""
         pg.GraphicsObject.__init__(self)
         self.data = data
         self.rect = None
         self.picture = None
-        self.setFlag(self.ItemUsesExtendedStyleOption)        # 只重画部分图形，大大提高界面更新速度
+        self.setFlag(self.ItemUsesExtendedStyleOption)  # 只重画部分图形，大大提高界面更新速度
 
         self.offset = 0
         self.low = 0
         self.high = 1
         self.picture = QtGui.QPicture()
         self.pictures = []
-        self.generatePicture(self.data)        # 刷新柱线
+        self.generatePicture(self.data)  # 刷新柱线
 
-    def generatePicture(self, data=None, redraw=False):        # 画柱线
+
+    def generatePicture(self, data=None, redraw=False):  # 画柱线
         """重新生成图形对象"""
         # 重画或者只更新最后一个K线
         if redraw:
@@ -313,10 +323,10 @@ class VolumeItem(pg.GraphicsObject):
                 p = QtGui.QPainter(picture)
                 if index > 0:
                     p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index-1,mv1_cache), QtCore.QPointF(index, row['mv1']))
+                    p.drawLine(QtCore.QPointF(index - 1, mv1_cache), QtCore.QPointF(index, row['mv1']))
                     mv1_cache = row['mv1']
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width=2))
-                    p.drawLine(QtCore.QPointF(index-1, mv2_cache), QtCore.QPointF(index, row['mv2']))
+                    p.drawLine(QtCore.QPointF(index - 1, mv2_cache), QtCore.QPointF(index, row['mv2']))
                     mv2_cache = row['mv2']
 
                 # 下跌绿色（实心）, 上涨红色（空心）
@@ -346,11 +356,13 @@ class VolumeItem(pg.GraphicsObject):
                 p.end()
                 self.pictures.append(picture)
 
-    def update(self):    # 手动重画
+
+    def update(self):  # 手动重画
         if not self.scene() is None:
             self.scene().update()
 
-    def paint(self, painter, opt, w):    # 自动重画
+
+    def paint(self, painter, opt, w):  # 自动重画
         rect = opt.exposedRect
         xmin, xmax = (max(0, int(rect.left())), min(int(len(self.pictures)), int(rect.right())))
         if not self.rect == (rect.left(), rect.right()) or self.picture is None:
@@ -361,14 +373,15 @@ class VolumeItem(pg.GraphicsObject):
             self.picture.play(painter)
 
 
-    def createPic(self, xmin, xmax):    # 缓存图片
+    def createPic(self, xmin, xmax):  # 缓存图片
         picture = QPicture()
         p = QPainter(picture)
         [pic.play(p) for pic in self.pictures[xmin:xmax]]
         p.end()
         return picture
 
-    def boundingRect(self):    # 定义边界
+
+    def boundingRect(self):  # 定义边界
         return QtCore.QRectF(0, self.low, len(self.pictures), (self.high - self.low))
 
 
@@ -378,13 +391,14 @@ class VolumeItem(pg.GraphicsObject):
 class MACDItem(pg.GraphicsObject):
     """K线图形对象"""
 
+
     def __init__(self, data: pd.DataFrame):  # 初始化
         """初始化"""
         pg.GraphicsObject.__init__(self)
         self.data = data
         self.rect = None
         self.picture = None
-        self.setFlag(self.ItemUsesExtendedStyleOption)        # 只重画部分图形，大大提高界面更新速度
+        self.setFlag(self.ItemUsesExtendedStyleOption)  # 只重画部分图形，大大提高界面更新速度
 
         self.offset = 0
         self.low = 0
@@ -395,9 +409,9 @@ class MACDItem(pg.GraphicsObject):
         self.generatePicture(self.data)
 
 
-    def generatePicture(self, data=None, redraw=False):    # 画柱线
+    def generatePicture(self, data=None, redraw=False):  # 画柱线
         """重新生成图形对象"""
-        if redraw:          # 重画或者只更新最后一个周期的线
+        if redraw:  # 重画或者只更新最后一个周期的线
             self.pictures = []
         elif self.pictures:
             self.pictures.pop()
@@ -416,20 +430,20 @@ class MACDItem(pg.GraphicsObject):
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:                   # 画diff线和dea线
+                if index > 0:  # 画diff线和dea线
                     p.setPen(pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
-                    p.drawLine(QtCore.QPointF(index-1,diff_cache), QtCore.QPointF(index, row['diff']))
+                    p.drawLine(QtCore.QPointF(index - 1, diff_cache), QtCore.QPointF(index, row['diff']))
                     diff_cache = row['diff']
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index-1, dea_cache), QtCore.QPointF(index, row['dea']))
+                    p.drawLine(QtCore.QPointF(index - 1, dea_cache), QtCore.QPointF(index, row['dea']))
                     dea_cache = row['dea']
 
-                if row['bar'] > 0:      # macd 红柱
+                if row['bar'] > 0:  # macd 红柱
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=6))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))
                     p.drawLine(QtCore.QPointF(index, 0), QtCore.QPointF(index, row['bar']))
 
-                else:           # macd 绿柱
+                else:  # macd 绿柱
 
                     p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=6))
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
@@ -438,11 +452,13 @@ class MACDItem(pg.GraphicsObject):
                 p.end()
                 self.pictures.append(picture)
 
-    def update(self):    # 手动重画
+
+    def update(self):  # 手动重画
         if not self.scene() is None:
             self.scene().update()
 
-    def paint(self, painter, opt, w): # 自动重画
+
+    def paint(self, painter, opt, w):  # 自动重画
         rect = opt.exposedRect
         xmin, xmax = (max(0, int(rect.left())), min(int(len(self.pictures)), int(rect.right())))
         if not self.rect == (rect.left(), rect.right()) or self.picture is None:
@@ -452,12 +468,14 @@ class MACDItem(pg.GraphicsObject):
         elif not self.picture is None:
             self.picture.play(painter)
 
-    def createPic(self, xmin, xmax):        # 缓存图片
+
+    def createPic(self, xmin, xmax):  # 缓存图片
         picture = QPicture()
         p = QPainter(picture)
         [pic.play(p) for pic in self.pictures[xmin:xmax]]
         p.end()
         return picture
+
 
     # 定义边界
     def boundingRect(self):
@@ -470,11 +488,11 @@ class MACDItem(pg.GraphicsObject):
 class KLineWidget(KeyWraper):
     """用于显示价格走势图"""
 
-    clsId = 0           # 窗口标识
+    clsId = 0  # 窗口标识
 
-    listOpenInterest = []       # 保存K线数据的列表和Numpy Array对象
+    listOpenInterest = []  # 保存K线数据的列表和Numpy Array对象
     arrows = []
-    initCompleted = False       # 是否完成了历史数据的读取标志
+    initCompleted = False  # 是否完成了历史数据的读取标志
 
 
     def __init__(self, parent=None):
@@ -507,34 +525,32 @@ class KLineWidget(KeyWraper):
         self.subSigPlots = {}
         # 初始化完成
         self.initCompleted = False
-        self.initUi()   # 调用函数
+        self.crosshair = None
+        self.initUi()  # 调用函数
+
 
     def initUi(self):
         """初始化界面"""
-
         pg.setConfigOptions(leftButtonPan=True, antialias=True)  # 禁止画框放大，并启用抗锯齿
-        # 主图
 
+        # 主图
         self.pw = pg.PlotWidget(background=QtGui.QColor(13, 9, 27))
         self.pw.setContentsMargins(0, 0, 0, 0)  # 去掉边框
+
         # 界面布局
         self.lay_KL = pg.GraphicsLayout(border=True)
         self.lay_KL.setContentsMargins(0, 0, 1, 1)  # 左、上、右、下的外边距，图形层与窗口边缘的距离
         self.lay_KL.setBorder(color=(255, 0, 0), width=1)  # 设置图层边框红色，粗1
         self.lay_KL.setZValue(0)
-        self.lay_KL.setSpacing(2)  # 设置图层内图元间距，多个图元间距
-        # self.KLtitle = self.lay_KL.addLabel(u'')  # 设置标题标签,默认不需要
+        self.lay_KL.setSpacing(3)  # 设置图层内图元间距，多个图元间距
         self.pw.setCentralItem(self.lay_KL)  # 设置主图
-        # # 设置横坐标
-        # xdict = {}
-        # self.axisTime = MyStringAxis(xdict, orientation='bottom')  # 时间坐标轴
+
         # 初始化子图
         self.initplotKline()  # K线子图
         self.initplotVol()  # 成交量子图
         self.initplotMACD()  # 指标子图
         # 注册十字光标
         self.crosshair = Crosshair(self.pw, self)
-        # self.crossgair = ChartCursor(self, self.datas, self,pwKL,  )
         # 设置界面
         self.VboxL = QVBoxLayout()  # 垂直布局
         self.VboxL.setContentsMargins(0, 0, 0, 0)  # Vboxlayout的外边距要去掉,这个非常难找
@@ -542,6 +558,7 @@ class KLineWidget(KeyWraper):
         self.setLayout(self.VboxL)  # 设置布局
         # 初始化完成
         self.initCompleted = True
+
 
     def loadData(self, datas):
         """
@@ -565,10 +582,8 @@ class KLineWidget(KeyWraper):
 
         self.datas = pd.concat([datas, mv_vol, macd], axis=1)
 
-        # data = pd.concat([datas, mv_vol, macd], axis=1)       #后面改过之后,传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行
-        # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
-        # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
-        # print('传入的数据为: ', self.datas)
+        # data = pd.concat([datas, mv_vol, macd], axis=1)       #后面改过之后,传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行  # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行  # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引  # print('传入的数据为: ', self.datas)
+
 
     def initplotKline(self):
         """初始化蜡烛图子图"""
@@ -586,7 +601,7 @@ class KLineWidget(KeyWraper):
         self.pwKL.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
         self.pwKL.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
         self.pwKL.setMaximumHeight(800)  # 图项最大高度
-        self.pwKL.setMinimumHeight(350)   # 图项最小高度
+        self.pwKL.setMinimumHeight(400)  # 图项最小高度
         self.pwKL.hideButtons()  # 隐藏刻度按钮
         self.pwKL.setZValue(0)
         self.pwKL.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
@@ -601,6 +616,7 @@ class KLineWidget(KeyWraper):
         self.pwKL.addItem(self.candle)
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwKL)
+
 
     def initplotVol(self):
         """初始化成交量子图"""
@@ -665,6 +681,7 @@ class KLineWidget(KeyWraper):
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwMACD)
 
+
     # ----------------------------------------------------------------------
     #  画图相关 
     # ----------------------------------------------------------------------
@@ -674,20 +691,28 @@ class KLineWidget(KeyWraper):
             self.candle.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画K线
             self.plotMark()  # 显示开平仓信号位置
 
+
     def plotVol(self, redraw=False, xmin=0, xmax=-1):
         """重画成交量子图"""
         if self.initCompleted:
             self.volume.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画成交量子图
+
 
     def PlotMACD(self, redraw=False, xmin=0, xmax=-1):
         """重画MACD子图"""
         if self.initCompleted:
             self.macd.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画MACD子图
 
-    def set_pwKL_yRange(self):      # 设置pwKL的y轴显示范围,该函数由sigXRangeChanged信号驱动
+
+    def set_pwKL_yRange(self):  # 设置pwKL的y轴显示范围,该函数由sigXRangeChanged信号驱动
         datas = self.datas
         view = self.pwKL.getViewBox()
         vRange = view.viewRange()
+        if self.crosshair:
+            x = int(self.crosshair.xAxis)
+            y = int(self.crosshair.yAxis)
+            self.crosshair.signal.emit(x, y)
+
         xmin = max(0, int(vRange[0][0]))
         xmax = max(0, int(vRange[0][1]))
         try:
@@ -704,6 +729,7 @@ class KLineWidget(KeyWraper):
         else:
             view.setRange(yRange=(0, 1))
 
+
     def set_pwVol_yRange(self):  # 设置pwVol的y轴显示范围,该函数由sigXRangeChanged信号驱动
         datas = self.datas
         view = self.pwVol.getViewBox()
@@ -716,11 +742,12 @@ class KLineWidget(KeyWraper):
             xmax = xmax
         if len(datas) > 0 and xmax > xmin:
             ymax = max(datas[xmin:xmax]['volume'])
-            view.setRange(yRange=(ymax//13, ymax))
+            view.setRange(yRange=(ymax // 13, ymax))
         else:
             view.setRange(yRange=(0, 1))
 
-    def set_pwMACD_yRange(self):      # 设置pwMACD的y轴显示范围,该函数由sigXRangeChanged信号驱动
+
+    def set_pwMACD_yRange(self):  # 设置pwMACD的y轴显示范围,该函数由sigXRangeChanged信号驱动
         datas = self.datas
         view = self.pwMACD.getViewBox()
         vRange = view.viewRange()
@@ -739,6 +766,7 @@ class KLineWidget(KeyWraper):
                 pass
         else:
             view.setRange(yRange=(0, 1))
+
 
     def addSig(self, sig, main=True):
         """新增信号图"""
@@ -779,6 +807,7 @@ class KLineWidget(KeyWraper):
                 self.subSigData[sig] = datas[sig]
                 self.subSigPlots[sig].setData(np.append(datas[sig], 0), pen=self.subSigColor[sig][0], name=sig)
 
+
     def plotMark(self):
         """显示开平仓信号"""
         # 检查是否有数据
@@ -796,9 +825,9 @@ class KLineWidget(KeyWraper):
                 arrow = pg.ArrowItem(pos=(i, self.datas[i]['low']), angle=90, brush=(255, 0, 0))
             # 卖信号
             elif self.listSig[i] < 0:
-                arrow = pg.ArrowItem(pos=(i, self.datas[i]['high']), angle=-90, brush=(0, 255, 0))
-            # self.pwKL.addItem(arrow)
-            # self.arrows.append(arrow)
+                arrow = pg.ArrowItem(pos=(i, self.datas[i]['high']), angle=-90, brush=(0, 255, 0))  # self.pwKL.addItem(arrow)  # self.arrows.append(arrow)
+
+
     # ----------------------------------------------------------------------
     #  界面刷新相关
     # ----------------------------------------------------------------------
@@ -809,15 +838,16 @@ class KLineWidget(KeyWraper):
         # 调用画图函数
         self.index = len(self.datas)
         self.crosshair.datas = self.datas
+        self.crosshair.signal.emit(None, None)
         # 设置横坐标
 
         self.axisTime = DatetimeAxis(self.datas, orientation='bottom')  # 时间坐标轴
-        self.pwKL.setAxisItems(axisItems={'bottom':self.axisTime})
+        self.pwKL.setAxisItems(axisItems={'bottom': self.axisTime})
 
         self.plotAll(redraw, 0, len(self.datas))
         if not update:
             self.updateAll()
-        # self.crosshair.signal.emit((None, None))
+
 
     def plotAll(self, redraw=True, xMin=0, xMax=-1):
         """
@@ -838,6 +868,7 @@ class KLineWidget(KeyWraper):
         self.PlotMACD(redraw, xMin, xMax)  # K线副图，MACD
         self.refresh()
 
+
     def updateAll(self):
         """
         手动更新所有K线图形，K线播放模式下需要
@@ -849,6 +880,7 @@ class KLineWidget(KeyWraper):
         self.candle.update()
         self.volume.update()
         self.macd.update()
+
 
         def update(view, low, high):
             vRange = view.viewRange()
@@ -865,9 +897,11 @@ class KLineWidget(KeyWraper):
             else:
                 view.setRange(yRange=(0, 1))
 
+
         update(self.pwKL.getViewBox(), 'low', 'high')
         update(self.pwVol.getViewBox(), 'volume', 'volume')
         update(self.pwMACD.getViewBox(), 'diff', 'diff')
+
 
     def refresh(self):
         """
@@ -901,7 +935,8 @@ class KLineWidget(KeyWraper):
             self.refresh()
             x = self.index
             y = self.datas[x]['close']
-            self.crosshair.signal.emit((x, y))
+            self.crosshair.signal.emit(x, y)
+
 
     def onPre(self):
         """跳转到上一个开平仓点"""
@@ -912,7 +947,8 @@ class KLineWidget(KeyWraper):
             self.refresh()
             x = self.index
             y = self.datas[x]['close']
-            self.crosshair.signal.emit((x, y))
+            self.crosshair.signal.emit(x, y)
+
 
     def onDown(self):
         """放大显示区间"""
@@ -922,8 +958,9 @@ class KLineWidget(KeyWraper):
             x = self.index - self.countK / 2 + 2 if int(self.crosshair.xAxis) < self.index - self.countK / 2 + 2 else int(self.crosshair.xAxis)
             x = self.index + self.countK / 2 - 2 if x > self.index + self.countK / 2 - 2 else x
             x = len(self.datas) - 1 if x > len(self.datas) - 1 else int(x)
-            y = self.datas[x][2]
-            self.crosshair.signal.emit((x, y))
+            y = self.datas.loc[x][2]
+            self.crosshair.signal.emit(x, y)
+
 
     def onUp(self):
         """缩小显示区间"""
@@ -933,30 +970,33 @@ class KLineWidget(KeyWraper):
             x = self.index - self.countK / 2 + 2 if int(self.crosshair.xAxis) < self.index - self.countK / 2 + 2 else int(self.crosshair.xAxis)
             x = self.index + self.countK / 2 - 2 if x > self.index + self.countK / 2 - 2 else x
             x = len(self.datas) - 1 if x > len(self.datas) - 1 else int(x)
-            y = self.datas[x]['close']
-            self.crosshair.signal.emit((x, y))
+            y = self.datas.loc[x]['close']
+            self.crosshair.signal.emit(x, y)
+
 
     def onLeft(self):
         """向左移动"""
         if len(self.datas) > 0 and int(self.crosshair.xAxis) > 2:
             x = int(self.crosshair.xAxis) - 1
             x = len(self.datas) - 1 if x > len(self.datas) - 1 else int(x)
-            y = self.datas[x]['close']
+            y = self.datas.loc[x]['close']
             if x <= self.index - self.countK / 2 + 2 and self.index > 1:
                 self.index -= 1
                 self.refresh()
-            self.crosshair.signal.emit((x, y))
+            self.crosshair.signal.emit(x, y)
+
 
     def onRight(self):
         """向右移动"""
         if len(self.datas) > 0 and int(self.crosshair.xAxis) < len(self.datas) - 1:
             x = int(self.crosshair.xAxis) + 1
             x = len(self.datas) - 1 if x > len(self.datas) - 1 else int(x)
-            y = self.datas[x]['close']
+            y = self.datas.loc[x]['close']
             if x >= self.index + int(self.countK / 2) - 2:
                 self.index += 1
                 self.refresh()
-            self.crosshair.signal.emit((x, y))
+            self.crosshair.signal.emit(x, y)
+
 
     # ----------------------------------------------------------------------
     # 界面回调相关
@@ -981,6 +1021,7 @@ class KLineWidget(KeyWraper):
         self.sigData = {}
         self.datas = None
 
+
     def clearSig(self, main=True):
         """清空信号图形"""
         # 清空信号图
@@ -995,12 +1036,14 @@ class KLineWidget(KeyWraper):
             self.subSigData = {}
             self.subSigPlots = {}
 
+
     def updateSig(self, sig):
         """刷新买卖信号"""
         self.listSig = sig
         self.plotMark()
 
-    def onBar(self, bar:dict):
+
+    def onBar(self, bar: dict):
         """
         新增K线数据,K线播放模式
         """
@@ -1033,10 +1076,8 @@ class KLineWidget(KeyWraper):
             self.listBar[-1] = (nrecords, bar['open'], bar['close'], bar['low'], bar['high'])
             self.listVol[-1] = recordVol
         else:
-            self.datas = np.rec.array([(bar['datetime'], bar['open'], bar['close'], bar['low'], bar['high'], bar['volume'], bar['openInterest'])],
-                                      names=('datetime', 'open', 'close', 'low', 'high', 'volume', 'openInterest'))
-            self.listBar = np.rec.array([(nrecords, bar['open'], bar['close'], bar['low'], bar['high'])],
-                                        names=('time_int', 'open', 'close', 'low', 'high'))
+            self.datas = np.rec.array([(bar['datetime'], bar['open'], bar['close'], bar['low'], bar['high'], bar['volume'], bar['openInterest'])], names=('datetime', 'open', 'close', 'low', 'high', 'volume', 'openInterest'))
+            self.listBar = np.rec.array([(nrecords, bar['open'], bar['close'], bar['low'], bar['high'])], names=('time_int', 'open', 'close', 'low', 'high'))
             self.listVol = np.rec.array([recordVol], names=('time_int', 'open', 'close', 'low', 'high'))
             self.get_yaxis_range(self.datas)
 
@@ -1047,5 +1088,3 @@ class KLineWidget(KeyWraper):
         self.get_yaxis_range(self.datas)
 
         return newBar
-
-
