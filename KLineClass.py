@@ -2,8 +2,10 @@
 
 import numpy as np
 import pandas as pd
+from datetime import datetime
 from functools import partial
 from collections import deque
+from typing import List, Dict, Type, Tuple
 from tqsdk.ta import PUBU, MV, MACD
 
 from PySide6.QtGui import *
@@ -99,51 +101,44 @@ class KeyWraper(QWidget):
     def onPaint(self):   # 画图
         pass
 
-
-########################################################################
-# 选择缩放功能支持
-########################################################################
-class CustomViewBox(pg.ViewBox):
-    def __init__(self, *args, **kwds):
-        pg.ViewBox.__init__(self, *args, **kwds)
-
-
-    # def mouseClickEvent(self, ev):    ## 右键自适应
-    #     if ev.button() == QtCore.Qt.RightButton:
-    #         self.autoRange()
-
-
 ########################################################################
 # 时间序列，横坐标支持
 ########################################################################
-class MyStringAxis(pg.AxisItem):
-    """时间序列横坐标支持"""
-    def __init__(self, xdict, *args, **kwargs):
-        pg.AxisItem.__init__(self, *args, **kwargs)
-        self.minVal = 0
-        self.maxVal = 0
-        self.xdict = xdict
-        self.x_values = np.asarray(xdict.keys())
-        self.x_strings = xdict.values()
-        self.setPen(color=(255, 255, 255, 255), width=0.8)
-        # self.setStyle(tickFont=QFont("Arial", 6, QFont.Bold), autoExpandTextSpace=True)
+class DatetimeAxis(pg.AxisItem):
 
-    def update_xdict(self, xdict):    # 更新坐标映射表
-        self.xdict.update(xdict)
-        self.x_values = np.asarray(self.xdict.keys())
-        self.x_strings = self.xdict.values()
+    def __init__(self, datas, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def tickStrings(self, values, scale, spacing):    # 将原始横坐标转换为时间字符串,第一个坐标包含日期
+        self.data = datas  # 传入k线数据
+        self.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=1))  #  设置时间轴边框颜色
+        self.tickFont = QtGui.QFont("Arial", 6)  # 刻度字体
+
+
+    def tickStrings(self, values: List[int], scale: float, spacing: int):
+        """
+        Convert original index to datetime string.
+        values自动传入x坐标
+        """
+        # 行索引和时间组合字典，行索引和x轴对应
+        datetime_index_map = dict(zip(self.data.index, self.data.datetime))
         strings = []
-        for v in values:
-            vs = v * scale
-            if vs in self.x_values:
-                vstr = self.x_strings[np.abs(self.x_values - vs).argmin()]
-                vstr = vstr.strftime('%Y-%m-%d %H:%M:%S')
+        for ix in values:
+            dt = datetime_index_map.get(ix, None)  # x轴对应的时间
+            if not dt:
+                s = ""
             else:
-                vstr = ""
-            strings.append(vstr)
+                dt = datetime.fromtimestamp(dt / 1e9)  # 转换成datetime格式
+                if dt.hour:  # 日内周期
+                    s = dt.strftime("%m-%d %H:%M")
+                else:
+                    s = dt.strftime("%Y-%m-%d")
+            strings.append(s)
+
         return strings
+
+
+    def clear_all(self) -> None:
+        self._barmanager.clear()
 
 
 ########################################################################
@@ -182,37 +177,37 @@ class CandlestickItem(pg.GraphicsObject):
         else:
             self.low, self.high = (0, 1)
 
-        pb1_cache = 0
-        pb2_cache = 0
-        pb3_cache = 0
-        pb4_cache = 0
-        pb5_cache = 0
-        pb6_cache = 0
+        # pb1_cache = 0
+        # pb2_cache = 0
+        # pb3_cache = 0
+        # pb4_cache = 0
+        # pb5_cache = 0
+        # pb6_cache = 0
 
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:               # 画六条瀑布线
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
-                    pb1_cache = row['pb1']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
-                    pb2_cache = row['pb2']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
-                    pb3_cache = row['pb3']
-                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
-                    pb4_cache = row['pb4']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
-                    pb5_cache = row['pb5']
-                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
-                    pb6_cache = row['pb6']
+                # if index > 0:               # 画六条瀑布线
+                    # p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
+                    # p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
+                    # pb1_cache = row['pb1']
+                    # p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
+                    # p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
+                    # pb2_cache = row['pb2']
+                    # p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
+                    # p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
+                    # pb3_cache = row['pb3']
+                    # p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
+                    # p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
+                    # pb4_cache = row['pb4']
+                    # p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
+                    # p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
+                    # pb5_cache = row['pb5']
+                    # p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width = 2))
+                    # p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
+                    # pb6_cache = row['pb6']
 
                 # 画蜡烛图,下跌绿色（实心）, 上涨红色（空心）
 
@@ -247,6 +242,8 @@ class CandlestickItem(pg.GraphicsObject):
 
                 p.end()
                 self.pictures.append(picture)
+        # p = QtGui.QPainter(picture)
+        # p.drawLines()
 
     def update(self):    # 手动重画
         if not self.scene() is None:
@@ -315,7 +312,7 @@ class VolumeItem(pg.GraphicsObject):
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
                 if index > 0:
-                    p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))
+                    p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width=2))
                     p.drawLine(QtCore.QPointF(index-1,mv1_cache), QtCore.QPointF(index, row['mv1']))
                     mv1_cache = row['mv1']
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width=2))
@@ -528,9 +525,9 @@ class KLineWidget(KeyWraper):
         self.lay_KL.setSpacing(2)  # 设置图层内图元间距，多个图元间距
         # self.KLtitle = self.lay_KL.addLabel(u'')  # 设置标题标签,默认不需要
         self.pw.setCentralItem(self.lay_KL)  # 设置主图
-        # 设置横坐标
-        xdict = {}
-        self.axisTime = MyStringAxis(xdict, orientation='bottom')  # 时间坐标轴
+        # # 设置横坐标
+        # xdict = {}
+        # self.axisTime = MyStringAxis(xdict, orientation='bottom')  # 时间坐标轴
         # 初始化子图
         self.initplotKline()  # K线子图
         self.initplotVol()  # 成交量子图
@@ -575,8 +572,7 @@ class KLineWidget(KeyWraper):
 
     def initplotKline(self):
         """初始化蜡烛图子图"""
-        vb = CustomViewBox()
-        self.pwKL = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotKL'])), axisItems=None)
+        self.pwKL = pg.PlotItem(name=('_'.join([self.windowId, 'PlotKL'])), axisItems=None)
         self.pwKL.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
         self.pwKL.getViewBox().sigXRangeChanged.connect(self.set_pwKL_yRange)  # 子图的x轴范围改变信号
         self.pwKL.setMenuEnabled(False)  # 隐藏菜单
@@ -608,8 +604,7 @@ class KLineWidget(KeyWraper):
 
     def initplotVol(self):
         """初始化成交量子图"""
-        vb = CustomViewBox()
-        self.pwVol = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotVol'])), axisItems=None)
+        self.pwVol = pg.PlotItem(name=('_'.join([self.windowId, 'PlotVol'])), axisItems=None)
         self.pwVol.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
         self.pwVol.getViewBox().sigXRangeChanged.connect(self.set_pwVol_yRange)  # 子图的x轴范围改变信号
         self.pwVol.setMenuEnabled(False)  # 隐藏菜单
@@ -623,8 +618,9 @@ class KLineWidget(KeyWraper):
         self.pwVol.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
         self.pwVol.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
         self.pwVol.setMinimumHeight(80)  # 图项最小高度
-        self.pwVol.setMaximumHeight(150)  # 图项最大高度
+        self.pwVol.setMaximumHeight(130)  # 图项最大高度
         self.pwVol.hideButtons()  # 隐藏刻度按钮
+        self.pwVol.setZValue(0)
         self.pwVol.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
         self.pwVol.getAxis('bottom').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置下边坐标轴刻度字体
         self.pwVol.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
@@ -640,8 +636,7 @@ class KLineWidget(KeyWraper):
 
     def initplotMACD(self):
         """初始化MACD子图"""
-        vb = CustomViewBox()
-        self.pwMACD = pg.PlotItem(viewBox=vb, name=('_'.join([self.windowId, 'PlotMACD'])), axisItems=None)
+        self.pwMACD = pg.PlotItem(name=('_'.join([self.windowId, 'PlotMACD'])), axisItems=None)
         self.pwMACD.setXLink('_'.join([self.windowId, 'PlotKL']))  # 设置x轴关联，使两个子图的x坐标一致
         self.pwMACD.getViewBox().sigXRangeChanged.connect(self.set_pwMACD_yRange)  # 子图的x轴范围改变信号
         self.pwMACD.setMenuEnabled(False)  # 隐藏菜单
@@ -655,8 +650,9 @@ class KLineWidget(KeyWraper):
         self.pwMACD.getAxis('right').setWidth(40)  # 设置右边坐标轴宽度
         self.pwMACD.showGrid(True, True, alpha=0.3)  # 显示网格,alpha为网格的不透明度,范围0-1.0
         self.pwMACD.setMinimumHeight(80)  # 图项最小高度
-        self.pwMACD.setMaximumHeight(150)  # 图项最大高度
+        self.pwMACD.setMaximumHeight(130)  # 图项最大高度
         self.pwMACD.hideButtons()  # 隐藏刻度按钮
+        self.pwMACD.setZValue(0)
         self.pwMACD.getAxis('right').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置右边坐标轴刻度字体
         self.pwMACD.getAxis('bottom').setStyle(tickFont=QFont("Arial", 8, QFont.Bold), autoExpandTextSpace=True)  # 设置下边坐标轴刻度字体
         self.pwMACD.getAxis('right').setPen(QtGui.QColor(255, 0, 0))  # y轴颜色
@@ -813,6 +809,11 @@ class KLineWidget(KeyWraper):
         # 调用画图函数
         self.index = len(self.datas)
         self.crosshair.datas = self.datas
+        # 设置横坐标
+
+        self.axisTime = DatetimeAxis(self.datas, orientation='bottom')  # 时间坐标轴
+        self.pwKL.setAxisItems(axisItems={'bottom':self.axisTime})
+
         self.plotAll(redraw, 0, len(self.datas))
         if not update:
             self.updateAll()
