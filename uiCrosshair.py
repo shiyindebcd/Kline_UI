@@ -24,7 +24,7 @@ class Crosshair(QtCore.QObject):
         self.__view = parent
         self.master = master
         super(Crosshair, self).__init__()
-
+        self.datas = None
         self.xAxis = 0
         self.yAxis = 0
         self.yAxises = [0 for i in range(3)]

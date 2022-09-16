@@ -184,38 +184,11 @@ class CandlestickItem(pg.GraphicsObject):
         else:
             self.low, self.high = (0, 1)
 
-        pb1_cache = 0
-        pb2_cache = 0
-        pb3_cache = 0
-        pb4_cache = 0
-        pb5_cache = 0
-        pb6_cache = 0
-
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:               # 画六条瀑布线
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index-1, pb1_cache), QtCore.QPointF(index, row['pb1']))
-                    pb1_cache = row['pb1']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 85, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb2_cache), QtCore.QPointF(index, row['pb2']))
-                    pb2_cache = row['pb2']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb3_cache), QtCore.QPointF(index, row['pb3']))
-                    pb3_cache = row['pb3']
-                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb4_cache), QtCore.QPointF(index, row['pb4']))
-                    pb4_cache = row['pb4']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb5_cache), QtCore.QPointF(index, row['pb5']))
-                    pb5_cache = row['pb5']
-                    p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width = 2))
-                    p.drawLine(QtCore.QPointF(index - 1, pb6_cache), QtCore.QPointF(index, row['pb6']))
-                    pb6_cache = row['pb6']
-
                 # 画蜡烛图,下跌绿色（实心）, 上涨红色（空心）
                 if row['close'] < row['open']:  # 阴线情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
@@ -314,20 +287,11 @@ class VolumeItem(pg.GraphicsObject):
             self.high = data['volume'].max()
         else:
             self.high = 1
-        mv1_cache = 0
-        mv2_cache = 0
         npic = len(self.pictures)
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:
-                    p.setPen(pg.mkPen(QtGui.QColor(60, 60, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index - 1, mv1_cache), QtCore.QPointF(index, row['mv1']))
-                    mv1_cache = row['mv1']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 127), width=2))
-                    p.drawLine(QtCore.QPointF(index - 1, mv2_cache), QtCore.QPointF(index, row['mv2']))
-                    mv2_cache = row['mv2']
 
                 # 下跌绿色（实心）, 上涨红色（空心）
                 if row['close'] < row['open']:  # 阴线情况
@@ -423,20 +387,11 @@ class MACDItem(pg.GraphicsObject):
             self.low, self.high = (0, 1)
 
         npic = len(self.pictures)
-        diff_cache = 0
-        dea_cache = 0
 
         for index, row in data.iterrows():
             if index >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-                if index > 0:  # 画diff线和dea线
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
-                    p.drawLine(QtCore.QPointF(index - 1, diff_cache), QtCore.QPointF(index, row['diff']))
-                    diff_cache = row['diff']
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 255), width=2))
-                    p.drawLine(QtCore.QPointF(index - 1, dea_cache), QtCore.QPointF(index, row['dea']))
-                    dea_cache = row['dea']
 
                 if row['bar'] > 0:  # macd 红柱
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=6))  # 设置画笔颜色，宽度
@@ -506,6 +461,20 @@ class KLineWidget(KeyWraper):
         KLineWidget.clsId += 1
         self.windowId = str(KLineWidget.clsId)
 
+        # 画指标线需要的各种数据列表
+        self.pb1_list = []
+        self.pb2_list = []
+        self.pb3_list = []
+        self.pb4_list = []
+        self.pb5_list = []
+        self.pb6_list = []
+        self.mv1_list = []
+        self.mv2_list = []
+        self.diff_list = []
+        self.dea_list = []
+        self.candle_bar_list = []
+        self.macd_bar_list = []
+
         # 缓存数据
         self.datas = pd.DataFrame()
         self.listSig = []
@@ -566,11 +535,17 @@ class KLineWidget(KeyWraper):
         然后计算瀑布线和macd,合并到这个DataFrame中
         """
         pb1 = PUBU(datas, 3)
+        self.pb1_list = pb1['pb'].tolist()
         pb2 = PUBU(datas, 4)
+        self.pb2_list = pb2['pb'].tolist()
         pb3 = PUBU(datas, 9)
+        self.pb3_list = pb3['pb'].tolist()
         pb4 = PUBU(datas, 13)
+        self.pb4_list = pb4['pb'].tolist()
         pb5 = PUBU(datas, 18)
+        self.pb5_list = pb5['pb'].tolist()
         pb6 = PUBU(datas, 24)
+        self.pb6_list = pb6['pb'].tolist()
         datas['pb1'] = pb1
         datas['pb2'] = pb2
         datas['pb3'] = pb3
@@ -578,11 +553,22 @@ class KLineWidget(KeyWraper):
         datas['pb5'] = pb5
         datas['pb6'] = pb6
         mv_vol = MV(datas, 5, 20)
+        self.mv1_list = mv_vol['mv1'].tolist()
+        self.mv2_list = mv_vol['mv2'].tolist()
         macd = MACD(datas, 12, 26, 9)
+        self.diff_list = macd['diff'].tolist()
+        self.dea_list = macd['dea'].tolist()
 
         self.datas = pd.concat([datas, mv_vol, macd], axis=1)
+        self.candle_bar_list = self.datas[['open', 'high', 'low', 'close','volume']].to_records(index=True)
+        self.macd_bar_list = macd[['bar']].to_records(index=True)
 
-        # data = pd.concat([datas, mv_vol, macd], axis=1)       #后面改过之后,传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行  # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行  # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引  # print('传入的数据为: ', self.datas)
+        # 如果传进来的是从天勤直接获取的klines,前面有可能有无数据的空行,当从天勤请求的k线数量大于该合约原有的k线数量时,前面会以空行填充
+        # 需要下面这几句去掉空行,并重建index.因为我传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行
+        # data = pd.concat([datas, mv_vol, macd], axis=1)
+        # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
+        # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
+        # print('传入的数据为: ', self.datas)
 
 
     def initplotKline(self):
@@ -617,6 +603,21 @@ class KLineWidget(KeyWraper):
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwKL)
 
+        #   添加六条pubu线到图上
+        self.Curves_pb1 = self.pwKL.plot(self.pb1_list, pen=pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
+        self.Curves_pb1.setZValue(15)
+        self.Curves_pb2 = self.pwKL.plot(self.pb2_list, pen=pg.mkPen(QtGui.QColor(255, 85, 0), width=2))
+        self.Curves_pb2.setZValue(15)
+        self.Curves_pb3 = self.pwKL.plot(self.pb3_list, pen=pg.mkPen(QtGui.QColor(255, 0, 127), width=2))
+        self.Curves_pb3.setZValue(15)
+        self.Curves_pb4 = self.pwKL.plot(self.pb4_list, pen=pg.mkPen(QtGui.QColor(0, 255, 0), width=2))
+        self.Curves_pb4.setZValue(15)
+        self.Curves_pb5 = self.pwKL.plot(self.pb5_list, pen=pg.mkPen(QtGui.QColor(255, 0, 0), width=2))
+        self.Curves_pb5.setZValue(15)
+        self.Curves_pb6 = self.pwKL.plot(self.pb6_list, pen=pg.mkPen(QtGui.QColor(60, 60, 255), width=2))
+        self.Curves_pb6.setZValue(15)
+
+
 
     def initplotVol(self):
         """初始化成交量子图"""
@@ -649,6 +650,10 @@ class KLineWidget(KeyWraper):
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwVol)
 
+        self.Curves_mv1 = self.pwVol.plot(self.mv1_list, pen=pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
+        self.Curves_mv2 = self.pwVol.plot(self.mv2_list, pen=pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
+        self.Curves_mv1.setZValue(15)
+        self.Curves_mv2.setZValue(15)
 
     def initplotMACD(self):
         """初始化MACD子图"""
@@ -681,6 +686,9 @@ class KLineWidget(KeyWraper):
         self.lay_KL.nextRow()
         self.lay_KL.addItem(self.pwMACD)
 
+        self.Curves_diff = self.pwMACD.plot(self.diff_list, pen=pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
+        self.Curves_dea = self.pwMACD.plot(self.dea_list, pen=pg.mkPen(QtGui.QColor(255, 0, 255), width=2))
+
 
     # ----------------------------------------------------------------------
     #  画图相关 
@@ -689,6 +697,13 @@ class KLineWidget(KeyWraper):
         """重画K线子图"""
         if self.initCompleted:
             self.candle.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画K线
+            self.Curves_pb1.setData(self.pb1_list)
+            self.Curves_pb2.setData(self.pb2_list)
+            self.Curves_pb3.setData(self.pb3_list)
+            self.Curves_pb4.setData(self.pb4_list)
+            self.Curves_pb5.setData(self.pb5_list)
+            self.Curves_pb6.setData(self.pb6_list)
+
             self.plotMark()  # 显示开平仓信号位置
 
 
@@ -696,13 +711,15 @@ class KLineWidget(KeyWraper):
         """重画成交量子图"""
         if self.initCompleted:
             self.volume.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画成交量子图
-
+            self.Curves_mv1.setData(self.mv1_list)
+            self.Curves_mv2.setData(self.mv2_list)
 
     def PlotMACD(self, redraw=False, xmin=0, xmax=-1):
         """重画MACD子图"""
         if self.initCompleted:
             self.macd.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画MACD子图
-
+            self.Curves_diff.setData(self.diff_list)
+            self.Curves_dea.setData(self.dea_list)
 
     def set_pwKL_yRange(self):  # 设置pwKL的y轴显示范围,该函数由sigXRangeChanged信号驱动
         datas = self.datas
@@ -1010,7 +1027,7 @@ class KLineWidget(KeyWraper):
         self.index = int((xmin + xmax) / 2) + 1
 
 
-    # #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     # 数据相关
     # ----------------------------------------------------------------------
     def clearData(self):
