@@ -155,9 +155,12 @@ class Crosshair(QtCore.QObject):
             return
 
         if (isinstance(tickDatetime, dt.datetime)):
-            datetimeText = dt.datetime.strftime(tickDatetime, '%m-%d %H:%M')
             dateText = dt.datetime.strftime(tickDatetime, '%m-%d')
             timeText = dt.datetime.strftime(tickDatetime, '%H:%M')
+            if tickDatetime.hour:   # 日内周期
+                datetimeText = dt.datetime.strftime(tickDatetime, '%m-%d %H:%M')
+            else:                   # 日线及以上周期
+                datetimeText = dt.datetime.strftime(tickDatetime, '%Y-%m-%d')
         else:
             datetimeText = ""
             dateText = ""

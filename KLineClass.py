@@ -152,11 +152,8 @@ class CandlestickItem(pg.GraphicsObject):
     """K线图形对象"""
 
 
-    def __init__(self, data: pd.DataFrame):  # 初始化
+    def __init__(self, data: list):  # 初始化
         pg.GraphicsObject.__init__(self)
-
-        self.data = data
-        # print(type(self.data))
         # 只重画部分图形，大大提高界面更新速度
         self.rect = None
         self.picture = None
@@ -167,7 +164,7 @@ class CandlestickItem(pg.GraphicsObject):
         self.high = 1
         self.picture = QtGui.QPicture()
         self.pictures = []
-        self.generatePicture(self.data)  # 刷新K线
+        self.generatePicture(data)  # 刷新K线
 
 
     def generatePicture(self, data=None, redraw=False):  # 画K线
@@ -179,48 +176,48 @@ class CandlestickItem(pg.GraphicsObject):
         w = 0.4  # k线一半的宽度
 
         if len(data) > 0:
-            self.low = data['low'].min()
-            self.high = data['high'].max()
+            self.low = np.min(data['low'])
+            self.high = np.max(data['high'])
         else:
             self.low, self.high = (0, 1)
 
         npic = len(self.pictures)
-        for index, row in data.iterrows():
-            if index >= npic:
+        for (i, open_i, high_i, low_i, close_i, volume_i) in data:
+            if i >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
                 # 画蜡烛图,下跌绿色（实心）, 上涨红色（空心）
-                if row['close'] < row['open']:  # 阴线情况
+                if close_i < open_i:  # 阴线情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
-                    p.drawLine(QtCore.QPointF(index, row['low']), QtCore.QPointF(index, row['high']))  # 画上下影线
-                    p.drawRect(QtCore.QRectF(index - w, row['open'], w * 2, row['close'] - row['open']))  # 画矩形，实心K线
+                    p.drawLine(QtCore.QPointF(i, low_i), QtCore.QPointF(i, high_i))  # 画上下影线
+                    p.drawRect(QtCore.QRectF(i - w, open_i, w * 2, close_i - open_i))  # 画矩形，实心K线
 
-                elif row['close'] > row['open']:  # 阳线情况
+                elif close_i > open_i:  # 阳线情况
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=2))  # red
                     p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))  # red
-                    if (row['high'] != row['close']):  # 如果最高点不等于收盘价，画上影线
-                        p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['close']))
-                    if (row['low'] != row['open']):  # 如果最低点不等于开盘价，画下影线
-                        p.drawLine(QtCore.QPointF(index, row['open']), QtCore.QPointF(index, row['low']))
+                    if (high_i != close_i):  # 如果最高点不等于收盘价，画上影线
+                        p.drawLine(QtCore.QPointF(i, high_i), QtCore.QPointF(i, close_i))
+                    if (low_i != open_i):  # 如果最低点不等于开盘价，画下影线
+                        p.drawLine(QtCore.QPointF(i, open_i), QtCore.QPointF(i, low_i))
 
                     # p.drawRect(QtCore.QRectF(i - w, open, w * 2, close - open)) # 如果画实心阳线，只需画个实心矩形即可
                     # 画空心阳线的时候，需要画四条线
 
-                    p.drawLine(QtCore.QPointF(index - w, row['open']), QtCore.QPointF(index - w, row['close']))  # 画单根K线的左边线
-                    p.drawLine(QtCore.QPointF(index + w, row['open']), QtCore.QPointF(index + w, row['close']))  # 画单根K线的右边线
-                    p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画单根K线的上边线
-                    p.drawLine(QtCore.QPointF(index - w, row['open']), QtCore.QPointF(index + w, row['open']))  # 画单根K线的下边线
+                    p.drawLine(QtCore.QPointF(i - w, open_i), QtCore.QPointF(i - w, close_i))  # 画单根K线的左边线
+                    p.drawLine(QtCore.QPointF(i + w, open_i), QtCore.QPointF(i + w, close_i))  # 画单根K线的右边线
+                    p.drawLine(QtCore.QPointF(i - w, close_i), QtCore.QPointF(i + w, close_i))  # 画单根K线的上边线
+                    p.drawLine(QtCore.QPointF(i - w, open_i), QtCore.QPointF(i + w, open_i))  # 画单根K线的下边线
 
                 else:  # 平盘情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))  # 十字线时设为蓝色
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 0, 255)))
 
-                    p.drawLine(QtCore.QPointF(index, row['high']), QtCore.QPointF(index, row['low']))  # 画上下影线
-                    p.drawLine(QtCore.QPointF(index - w, row['close']), QtCore.QPointF(index + w, row['close']))  # 画一条横线
+                    p.drawLine(QtCore.QPointF(i, high_i), QtCore.QPointF(i, low_i))  # 画上下影线
+                    p.drawLine(QtCore.QPointF(i - w, close_i), QtCore.QPointF(i + w, close_i))  # 画一条横线
 
                 p.end()
-                self.pictures.append(picture)  # p = QtGui.QPainter(picture)  # p.drawLines()
+                self.pictures.append(picture)
 
 
     def update(self):  # 手动重画
@@ -258,10 +255,9 @@ class VolumeItem(pg.GraphicsObject):
     """K线图形对象"""
 
 
-    def __init__(self, data: pd.DataFrame):  # 初始化
+    def __init__(self, data: list):  # 初始化
         """初始化"""
         pg.GraphicsObject.__init__(self)
-        self.data = data
         self.rect = None
         self.picture = None
         self.setFlag(self.ItemUsesExtendedStyleOption)  # 只重画部分图形，大大提高界面更新速度
@@ -271,7 +267,7 @@ class VolumeItem(pg.GraphicsObject):
         self.high = 1
         self.picture = QtGui.QPicture()
         self.pictures = []
-        self.generatePicture(self.data)  # 刷新柱线
+        self.generatePicture(data)  # 刷新柱线
 
 
     def generatePicture(self, data=None, redraw=False):  # 画柱线
@@ -284,38 +280,37 @@ class VolumeItem(pg.GraphicsObject):
         w = 0.4  # k线一半的宽度
         self.low = 0
         if len(data) > 0:
-            self.high = data['volume'].max()
+            self.high = np.max(data['volume'])
         else:
             self.high = 1
         npic = len(self.pictures)
-        for index, row in data.iterrows():
-            if index >= npic:
+        for (i, open_i, high_i, low_i, close_i, volume_i) in data:
+            if i >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
-
                 # 下跌绿色（实心）, 上涨红色（空心）
-                if row['close'] < row['open']:  # 阴线情况
+                if close_i < open_i:  # 阴线情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
-                    p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
+                    p.drawRect(QtCore.QRectF(i - w, 0, w * 2, volume_i))  # 画矩形，实心成交量柱线
 
-                elif row['close'] > row['open']:  # 阳线情况
+                elif close_i > open_i:  # 阳线情况
                     p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=2))  # red
                     p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))  # red
 
-                    # p.drawRect(QtCore.QRectF(i - w, open, w * 2, close - open)) # 如果画实心阳线，只需画个实心矩形即可
+                    # p.drawRect(QtCore.QRectF(i - w, open_i, w * 2, close_i - open_i)) # 如果画实心阳线，只需画个实心矩形即可
                     # 画空心阳线的时候，需要画四条线
 
-                    p.drawLine(QtCore.QPointF(index - w, 0), QtCore.QPointF(index - w, row['volume']))  # 画单根成交量柱线的左边线
-                    p.drawLine(QtCore.QPointF(index + w, 0), QtCore.QPointF(index + w, row['volume']))  # 画单根成交量柱线的右边线
-                    p.drawLine(QtCore.QPointF(index - w, row['volume']), QtCore.QPointF(index + w, row['volume']))  # 画单根成交量柱线的下边线
-                    p.drawLine(QtCore.QPointF(index - w, 0), QtCore.QPointF(index + w, 0))  # 画单根成交量柱线的上边线
+                    p.drawLine(QtCore.QPointF(i - w, 0), QtCore.QPointF(i - w, volume_i))  # 画单根成交量柱线的左边线
+                    p.drawLine(QtCore.QPointF(i + w, 0), QtCore.QPointF(i + w, volume_i))  # 画单根成交量柱线的右边线
+                    p.drawLine(QtCore.QPointF(i - w, volume_i), QtCore.QPointF(i + w, volume_i))  # 画单根成交量柱线的下边线
+                    p.drawLine(QtCore.QPointF(i - w, 0), QtCore.QPointF(i + w, 0))  # 画单根成交量柱线的上边线
 
                 else:  # 平盘情况
                     p.setPen(pg.mkPen(QtGui.QColor(0, 0, 255), width=2))  # 十字线设为蓝色
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 0, 255)))  # 十字线设为蓝色
 
-                    p.drawRect(QtCore.QRectF(index - w, 0, w * 2, row['volume']))  # 画矩形，实心成交量柱线
+                    p.drawRect(QtCore.QRectF(i - w, 0, w * 2, volume_i))  # 画矩形，实心成交量柱线
 
                 p.end()
                 self.pictures.append(picture)
@@ -356,10 +351,9 @@ class MACDItem(pg.GraphicsObject):
     """K线图形对象"""
 
 
-    def __init__(self, data: pd.DataFrame):  # 初始化
+    def __init__(self, data: list):  # 初始化
         """初始化"""
         pg.GraphicsObject.__init__(self)
-        self.data = data
         self.rect = None
         self.picture = None
         self.setFlag(self.ItemUsesExtendedStyleOption)  # 只重画部分图形，大大提高界面更新速度
@@ -370,7 +364,7 @@ class MACDItem(pg.GraphicsObject):
         self.picture = QtGui.QPicture()
         self.pictures = []
 
-        self.generatePicture(self.data)
+        self.generatePicture(data)
 
 
     def generatePicture(self, data=None, redraw=False):  # 画柱线
@@ -379,30 +373,29 @@ class MACDItem(pg.GraphicsObject):
             self.pictures = []
         elif self.pictures:
             self.pictures.pop()
-
+        w = 0.1  # 柱线半宽
         if len(data) > 0:
-            self.low = data['bar'].min()
-            self.high = data['bar'].max()
+            self.low = np.min(data['bar'])
+            self.high = np.max(data['bar'])
         else:
             self.low, self.high = (0, 1)
 
         npic = len(self.pictures)
 
-        for index, row in data.iterrows():
-            if index >= npic:
+        for i, bar_i in data:
+            if i >= npic:
                 picture = QtGui.QPicture()
                 p = QtGui.QPainter(picture)
 
-                if row['bar'] > 0:  # macd 红柱
-                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=6))  # 设置画笔颜色，宽度
+                if bar_i > 0:  # macd 红柱
+                    p.setPen(pg.mkPen(QtGui.QColor(255, 0, 0), width=2))  # 设置画笔颜色，宽度
                     p.setBrush(pg.mkBrush(QtGui.QColor(255, 0, 0)))
-                    p.drawLine(QtCore.QPointF(index, 0), QtCore.QPointF(index, row['bar']))
+                    p.drawRect(QtCore.QRectF(i - w, 0, w * 2, bar_i))  # 画矩形
 
                 else:  # macd 绿柱
-
-                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=6))
+                    p.setPen(pg.mkPen(QtGui.QColor(0, 255, 0), width=2))
                     p.setBrush(pg.mkBrush(QtGui.QColor(0, 255, 0)))
-                    p.drawLine(QtCore.QPointF(index, 0), QtCore.QPointF(index, row['bar']))
+                    p.drawRect(QtCore.QRectF(i - w, 0, w * 2, bar_i))  # 画矩形
 
                 p.end()
                 self.pictures.append(picture)
@@ -560,15 +553,10 @@ class KLineWidget(KeyWraper):
         self.dea_list = macd['dea'].tolist()
 
         self.datas = pd.concat([datas, mv_vol, macd], axis=1)
-        self.candle_bar_list = self.datas[['open', 'high', 'low', 'close','volume']].to_records(index=True)
+        self.candle_bar_list = self.datas[['open', 'high', 'low', 'close', 'volume']].to_records(index=True)
         self.macd_bar_list = macd[['bar']].to_records(index=True)
 
-        # 如果传进来的是从天勤直接获取的klines,前面有可能有无数据的空行,当从天勤请求的k线数量大于该合约原有的k线数量时,前面会以空行填充
-        # 需要下面这几句去掉空行,并重建index.因为我传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行
-        # data = pd.concat([datas, mv_vol, macd], axis=1)
-        # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行
-        # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引
-        # print('传入的数据为: ', self.datas)
+        # 如果传进来的是从天勤直接获取的klines,前面有可能有无数据的空行,当从天勤请求的k线数量大于该合约原有的k线数量时,前面会以空行填充  # 需要下面这几句去掉空行,并重建index.因为我传入的数据已经预先把前面空的部分截掉了,所经这里不需要再截一次空行  # data = pd.concat([datas, mv_vol, macd], axis=1)  # self.datas = data.drop(data[data['id']<0].index)       # 删除所有没有数据的空行  # self.datas = self.datas.reset_index(drop=True)         # 删除开头空白的数据行后重建索引  # print('传入的数据为: ', self.datas)
 
 
     def initplotKline(self):
@@ -618,7 +606,6 @@ class KLineWidget(KeyWraper):
         self.Curves_pb6.setZValue(15)
 
 
-
     def initplotVol(self):
         """初始化成交量子图"""
         self.pwVol = pg.PlotItem(name=('_'.join([self.windowId, 'PlotVol'])), axisItems=None)
@@ -655,6 +642,7 @@ class KLineWidget(KeyWraper):
         self.Curves_mv1.setZValue(15)
         self.Curves_mv2.setZValue(15)
 
+
     def initplotMACD(self):
         """初始化MACD子图"""
         self.pwMACD = pg.PlotItem(name=('_'.join([self.windowId, 'PlotMACD'])), axisItems=None)
@@ -688,6 +676,8 @@ class KLineWidget(KeyWraper):
 
         self.Curves_diff = self.pwMACD.plot(self.diff_list, pen=pg.mkPen(QtGui.QColor(255, 255, 0), width=2))
         self.Curves_dea = self.pwMACD.plot(self.dea_list, pen=pg.mkPen(QtGui.QColor(255, 0, 255), width=2))
+        self.Curves_diff.setZValue(15)
+        self.Curves_dea.setZValue(15)
 
 
     # ----------------------------------------------------------------------
@@ -696,7 +686,7 @@ class KLineWidget(KeyWraper):
     def plotKline(self, redraw=False, xmin=0, xmax=-1):
         """重画K线子图"""
         if self.initCompleted:
-            self.candle.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画K线
+            self.candle.generatePicture(self.candle_bar_list[xmin:xmax], redraw)  # 画K线
             self.Curves_pb1.setData(self.pb1_list)
             self.Curves_pb2.setData(self.pb2_list)
             self.Curves_pb3.setData(self.pb3_list)
@@ -710,16 +700,18 @@ class KLineWidget(KeyWraper):
     def plotVol(self, redraw=False, xmin=0, xmax=-1):
         """重画成交量子图"""
         if self.initCompleted:
-            self.volume.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画成交量子图
+            self.volume.generatePicture(self.candle_bar_list[xmin:xmax], redraw)  # 画成交量子图
             self.Curves_mv1.setData(self.mv1_list)
             self.Curves_mv2.setData(self.mv2_list)
+
 
     def PlotMACD(self, redraw=False, xmin=0, xmax=-1):
         """重画MACD子图"""
         if self.initCompleted:
-            self.macd.generatePicture(self.datas.loc[xmin:xmax], redraw)  # 画MACD子图
+            self.macd.generatePicture(self.macd_bar_list[xmin:xmax], redraw)  # 画MACD子图
             self.Curves_diff.setData(self.diff_list)
             self.Curves_dea.setData(self.dea_list)
+
 
     def set_pwKL_yRange(self):  # 设置pwKL的y轴显示范围,该函数由sigXRangeChanged信号驱动
         datas = self.datas
@@ -840,9 +832,13 @@ class KLineWidget(KeyWraper):
             # 买信号
             elif self.listSig[i] > 0:
                 arrow = pg.ArrowItem(pos=(i, self.datas[i]['low']), angle=90, brush=(255, 0, 0))
+                self.pwKL.addItem(arrow)
+                self.arrows.append(arrow)
             # 卖信号
             elif self.listSig[i] < 0:
-                arrow = pg.ArrowItem(pos=(i, self.datas[i]['high']), angle=-90, brush=(0, 255, 0))  # self.pwKL.addItem(arrow)  # self.arrows.append(arrow)
+                arrow = pg.ArrowItem(pos=(i, self.datas[i]['high']), angle=-90, brush=(0, 255, 0))
+                self.pwKL.addItem(arrow)
+                self.arrows.append(arrow)
 
 
     # ----------------------------------------------------------------------
