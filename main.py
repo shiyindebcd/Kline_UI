@@ -10,7 +10,7 @@ import datetime
 from tqsdk import TqApi, TqAuth, TargetPosTask, TqKq, TqBacktest, tafunc
 from tqsdk import ta, tafunc
 from datetime import date
-from KLineClass import *
+from KLineWidget import *
 from MainFrame import Ui_Form
 
 
