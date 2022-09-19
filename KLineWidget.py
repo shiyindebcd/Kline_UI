@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from collections import deque
-
+from typing import Dict,Any,List
+import math
 import numpy as np
 import pandas as pd
 import pyqtgraph as pg
 from PySide6 import QtGui
 from PySide6.QtGui import *
+from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import *
 from tqsdk.ta import MACD, MV, PUBU
 
-from K_Chart_assist import DatetimeAxis, KeyWraper
+from K_Chart_assist import DatetimeAxis, KeyWraper, DrawLineStyleWidget
 from K_Chart_Item import CandlestickItem, MACDItem, VolumeItem
 from uiCrosshair import Crosshair
 
@@ -52,6 +54,16 @@ class KLineWidget(KeyWraper):
         self.dea_list = []
         self.candle_bar_list = []
         self.macd_bar_list = []
+
+        self.drawing_line_list = []
+        self.drawing_line = None
+        self.line_first_point = None        # 手动画线的第一个点
+        self.line_second_point = None       # 手动画线的第二个点
+        self.draw_line_mode: bool = False   # 是否于画线状态
+        self.draw_widget: QtWidgets.QWidget = None
+        self.draw_line_color: str = '#FF00FF'   # 默认画线颜色    # 颜色值查询 https://www.sioe.cn/yingyong/yanse-rgb-16/
+        self.draw_line_width: int = 4           # 默认画线粗细
+
 
         # 缓存数据
         self.datas = pd.DataFrame()
@@ -441,8 +453,10 @@ class KLineWidget(KeyWraper):
 
         self.axisTime = DatetimeAxis(self.datas, orientation='bottom')  # 时间坐标轴
         self.pwKL.setAxisItems(axisItems={'bottom': self.axisTime})
-
         self.plotAll(redraw, 0, len(self.datas))
+        self.proxy = pg.SignalProxy(self.pwKL.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
+        self.proxy_clicked = pg.SignalProxy(self.pwKL.scene().sigMouseClicked, rateLimit=60, slot=self.mouseClicked)
+        self.viewbox = self.pwKL.getViewBox()
         if not update:
             self.updateAll()
 
@@ -475,6 +489,9 @@ class KLineWidget(KeyWraper):
         self.candle.pictrue = None
         self.volume.pictrue = None
         self.macd.picture = None
+        for item in self.drawing_line_list:
+            self.pw.removeItem(item)
+        self.drawing_line_list = []
         self.candle.update()
         self.volume.update()
         self.macd.update()
@@ -686,3 +703,76 @@ class KLineWidget(KeyWraper):
         self.get_yaxis_range(self.datas)
 
         return newBar
+
+    # ----------------------------------------------------------------------
+    # 鼠标画线相关
+    # ----------------------------------------------------------------------
+    def mouseMoved(self, evt):
+        pos = evt[0]
+        if self.pwKL.sceneBoundingRect().contains(pos):
+            mousePoint = self.viewbox.mapSceneToView(pos)
+            if self.draw_line_mode:
+                if self.line_first_point is not None:
+                    second_point = mousePoint
+                    angle = math.atan2((second_point.y() - self.line_first_point.y()),
+                                       (second_point.x() - self.line_first_point.x()))
+                    theta = angle * (180 / math.pi)
+                    self.drawing_line.setAngle(theta)
+
+
+    def mouseClicked(self, evt):
+        if not self.draw_line_mode:
+            pass
+        else:
+            pos = evt[0].pos()
+            if self.pwKL.sceneBoundingRect().contains(pos):
+                mousePoint = self.viewbox.mapSceneToView(pos)
+                if self.line_first_point is None:       # 如果第一点不存在,画第一点
+                    self.line_first_point = mousePoint
+                    # print('第一点坐标为:', int(self.line_first_point.x()), int(self.line_first_point.y()))
+
+                    self.drawing_line = pg.InfiniteLine(pos=(QPointF(int(self.line_first_point.x()), int(self.line_first_point.y()))),
+                            angle=0, movable=True, pen={'color': self.draw_line_color, 'width': self.draw_line_width})
+
+                    self.pwKL.addItem(self.drawing_line)
+                else:                                   # 如果第二点不存在,画第二点
+                    self.line_second_point = mousePoint
+                    # print('第二点坐标为:', int(self.line_second_point.x()), int(self.line_second_point.y()))
+                    # 计算与起始点的角度
+                    angle = math.atan2((int(self.line_second_point.y())-int(self.line_first_point.y())),
+                                       (int(self.line_second_point.x())-int(self.line_first_point.x())))
+                    theta = angle*(180/math.pi)
+                    self.drawing_line.setAngle(theta)
+                    self.drawing_line.setMovable(True)
+
+                    self.drawing_line_list.append(self.drawing_line)
+
+                    self.drawing_line = None
+                    self.line_first_point = None
+                    self.line_second_point = None
+                    self.draw_line_mode = False
+                    pass
+
+
+    def draw_line_by_mouse(self):
+        self.draw_line_mode = True
+    def set_draw_line_style(self):
+        if self.draw_widget is None:
+            self.draw_widget = DrawLineStyleWidget()
+            self.draw_widget.sinout_signal.connect(self.draw_widget_sinout_signal_emit)
+        self.draw_widget.show()
+
+
+    def draw_widget_sinout_signal_emit(self, data: Dict[str, Any]):
+        change_type = data['change_type']
+        if change_type == 'color':
+            self.draw_line_color = data['data']
+        elif change_type == 'linewidth':
+            self.draw_line_width = data['data']
+        elif change_type == 'pre_step':
+            if len(self.drawing_line_list) >= 1:
+                last_item = self.drawing_line_list[-1]
+                self.pwKL.removeItem(last_item)
+                self.drawing_line_list.pop()
+        pass
+

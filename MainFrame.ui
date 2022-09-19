@@ -221,7 +221,7 @@
                    <widget class="QPushButton" name="Btn_draw_line_order">
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
+                      <width>80</width>
                       <height>40</height>
                      </size>
                     </property>
@@ -251,7 +251,39 @@ QPushButton:pressed {
 }</string>
                     </property>
                     <property name="text">
-                     <string>画线下单</string>
+                     <string>画线</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="Btn_draw_line_style">
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton {
+	color: rgb(255, 0, 127);	
+	font: 700 16pt &quot;等线&quot;;
+	border: 2px solid rgb(65, 51, 156);
+	border-radius: 15px;
+	background-color: rgb(20, 9, 70);
+	text-align: center;
+}
+
+QPushButton:hover {
+	border: 2px solid rgb(255, 85, 0);
+}
+
+QPushButton:pressed {
+	
+	color: rgb(255, 0, 0);
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>样式</string>
                     </property>
                    </widget>
                   </item>

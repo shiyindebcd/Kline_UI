@@ -28,6 +28,8 @@ class MainWindows(QWidget, Ui_Form):
 
         self.Btn_add_K_charts_i.clicked.connect(self.show_i_K_chart)
         self.Btn_add_K_charts_rb.clicked.connect(self.show_rb_K_chart)
+        self.Btn_draw_line_order.clicked.connect(self.UI_K_chart.draw_line_by_mouse)
+        self.Btn_draw_line_style.clicked.connect(self.UI_K_chart.set_draw_line_style)
         self.Btn_klines_1min.clicked.connect(lambda: self.show_candels(self.Current_Species, '1min'))
         self.Btn_klines_15min.clicked.connect(lambda: self.show_candels(self.Current_Species, '15min'))
         self.Btn_klines_30min.clicked.connect(lambda: self.show_candels(self.Current_Species, '30min'))
