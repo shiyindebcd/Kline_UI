@@ -1,0 +1,27 @@
+<RCC>
+  <qresource prefix="icon">
+    <file>../ProcessTrader/icons/arrow-right-bold.svg</file>
+    <file>../ProcessTrader/icons/chrome.svg</file>
+    <file>../ProcessTrader/icons/Excel.svg</file>
+    <file>../ProcessTrader/icons/菜单.svg</file>
+    <file>../ProcessTrader/icons/分类.svg</file>
+    <file>../ProcessTrader/icons/更多.svg</file>
+    <file>../ProcessTrader/icons/勾选.svg</file>
+    <file>../ProcessTrader/icons/关闭 (1).svg</file>
+    <file>../ProcessTrader/icons/关闭.svg</file>
+    <file>../ProcessTrader/icons/减号.svg</file>
+    <file>../ProcessTrader/icons/箭头_向右.svg</file>
+    <file>../ProcessTrader/icons/箭头_向左.svg</file>
+    <file>../ProcessTrader/icons/警告.svg</file>
+    <file>../ProcessTrader/icons/清屏.svg</file>
+    <file>../ProcessTrader/icons/上.svg</file>
+    <file>../ProcessTrader/icons/设置.svg</file>
+    <file>../ProcessTrader/icons/双下拉箭头.svg</file>
+    <file>../ProcessTrader/icons/缩小.svg</file>
+    <file>../ProcessTrader/icons/下.svg</file>
+    <file>../ProcessTrader/icons/折叠-展开.svg</file>
+    <file>../ProcessTrader/icons/最大化-还原.svg</file>
+    <file>../ProcessTrader/icons/最小化.svg</file>
+    <file>../ProcessTrader/icons/作者.svg</file>
+  </qresource>
+</RCC>

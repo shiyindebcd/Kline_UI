@@ -124,6 +124,9 @@ class KLineWidget(KeyWraper):
         传进来pandas.DataFrame格式的k线数据,其中须有datetime, open, close, low, high 这几列
         然后计算瀑布线和macd,合并到这个DataFrame中
         """
+        # self.pwKL.clear()
+        # self.initplotKline()
+
         pb1 = PUBU(datas, 3)
         self.pb1_list = pb1['pb'].tolist()
         pb2 = PUBU(datas, 4)
@@ -181,12 +184,14 @@ class KLineWidget(KeyWraper):
         self.pwKL.getAxis('bottom').setPen(QtGui.QColor(255, 0, 0))  # x轴颜色
         self.pwKL.getAxis('right').setTextPen(QtGui.QColor(150, 150, 150))  # y轴刻度颜色
         self.pwKL.getAxis('bottom').setTextPen(QtGui.QColor(150, 150, 150))  # x轴刻度颜色
+        self.lay_KL.nextRow()
+        self.lay_KL.addItem(self.pwKL)
+        self.setting_candle_plot()
 
+    def setting_candle_plot(self):
         self.candle = CandlestickItem(self.datas)
         self.candle.setZValue(10)
         self.pwKL.addItem(self.candle)
-        self.lay_KL.nextRow()
-        self.lay_KL.addItem(self.pwKL)
 
         #   添加六条pubu线到图上
         self.Curves_pb1 = self.pwKL.plot(self.pb1_list, pen=pg.mkPen(QtGui.QColor(255, 255, 255), width=2))
@@ -452,6 +457,9 @@ class KLineWidget(KeyWraper):
         # 设置横坐标
 
         self.axisTime = DatetimeAxis(self.datas, orientation='bottom')  # 时间坐标轴
+        # self.pwKL.clear()
+        # self.setting_candle_plot()
+
         self.pwKL.setAxisItems(axisItems={'bottom': self.axisTime})
         self.plotAll(redraw, 0, len(self.datas))
         self.proxy = pg.SignalProxy(self.pwKL.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
@@ -486,12 +494,13 @@ class KLineWidget(KeyWraper):
         手动更新所有K线图形，K线播放模式下需要
         """
         datas = self.datas
-        self.candle.pictrue = None
+        self.candle.picture = None
         self.volume.pictrue = None
         self.macd.picture = None
         for item in self.drawing_line_list:
             self.pw.removeItem(item)
-        self.drawing_line_list = []
+            self.drawing_line_list.pop()
+        self.drawing_line_list.clear()
         self.candle.update()
         self.volume.update()
         self.macd.update()
