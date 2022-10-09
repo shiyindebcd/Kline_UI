@@ -33,7 +33,7 @@ class ReadWriteCsv(object): # csv文件读写类
         else:
             pass
 
-    def judge_config_exist(self, path):     # 判断文件是否存在
+    def judge_file_exist(self, path):     # 判断文件是否存在
 
         if not os.path.exists(path):
             df_tmp = pd.DataFrame()

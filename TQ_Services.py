@@ -8,6 +8,7 @@ import time
 import datetime
 import sys
 import os
+import pandas as pd
 from tqsdk import TqApi, TqKq, TqSim, TqAuth
 from read_write_file import ReadWriteCsv, Logger
 
@@ -30,29 +31,31 @@ class TQServices(Process):
     def run(self):
         sys.stdout = Logger(process_name='天勤行情数据服务日志')  # 由 logger 类实例化的对象接管系统标准输出
         self.api = TqApi(TqKq(), auth=TqAuth(self.main_tq_account, self.main_tq__pwd))
+        self.get_all_Available_contracts()
         while True:
             for key, value in self.self_selection.items():
                 path = './Klines_data/' + value + '_15min.csv'
                 if not os.path.exists(path):
                     self.create_new_file(value)
-                    print('k线数据文件已保存')
                 else:
                     # self.create_normal_klines(value)
-                    print('合约有k线数据')
+                    # print('合约有k线数据')
+                    pass
             if self.current_tmp['Contracts'] is None:
                 print('self.current_tmp is None')
                 self.current_tmp['Contracts'] = self.current_Kline['Contracts']
             else:
                 if self.current_Kline['Contracts'] != self.current_tmp['Contracts']:
                     self.quote = self.api.get_quote(self.current_Kline['Contracts'])
-                    print(self.quote)
-                    print(' 运行到这里了')
+                    # print(self.quote)
+                    # print(' 运行到这里了')
                     self.current_tmp['Contracts'] = self.current_Kline['Contracts']
                     self.quote_dict_Assignment(self.quote)
                 else:
                     self.api.wait_update()
                     self.quote_dict_Assignment(self.quote)
-
+            print('\n\n天勤行情服务正在运行中\n\n')
+            print('\n\n当前合约为: ', self.current_Kline['Contracts'])
 
     def quote_dict_Assignment(self, dict):                  # 给quote_dict赋值
          self.quote_dict['datetime'] = dict['datetime']
@@ -120,8 +123,73 @@ class TQServices(Process):
          self.quote_dict['stock_dividend_ratio'] = dict['stock_dividend_ratio']
          self.quote_dict['cash_dividend_ratio'] = dict['cash_dividend_ratio']
          self.quote_dict['expire_rest_days'] = dict['expire_rest_days']
-         self.quote_dict['commission'] = dict['commission']
-         self.quote_dict['margin'] = dict['margin']
+         # self.quote_dict['commission'] = dict['commission']             #  佣金
+         # self.quote_dict['margin'] = dict['margin']                       #  边缘 差价
+
+    def get_all_Available_contracts(self):
+
+        DCE_Main = self.api.query_cont_quotes(exchange_id="DCE")  # 主力合约
+        DCE_Cont = self.api.query_quotes(ins_class='CONT', exchange_id="DCE")  # 主连
+        DCE_Future = self.api.query_quotes(ins_class='FUTURE', exchange_id="DCE")  # 期货
+        DCE_Index = self.api.query_quotes(ins_class='INDEX', exchange_id="DCE")  # 指数
+        DCE_option = self.api.query_quotes(ins_class='OPTION', exchange_id="DCE")  # 期权
+
+        SHFE_Main = self.api.query_cont_quotes(exchange_id="SHFE")  # 主力合约
+        SHFE_Cont = self.api.query_quotes(ins_class='CONT', exchange_id="SHFE")  # 主连
+        SHFE_Future = self.api.query_quotes(ins_class='FUTURE', exchange_id="SHFE")  # 期货
+        SHFE_Index = self.api.query_quotes(ins_class='INDEX', exchange_id="SHFE")  # 指数
+        SHFE_option = self.api.query_quotes(ins_class='OPTION', exchange_id="SHFE")  # 期权
+
+        CZCE_Main = self.api.query_cont_quotes(exchange_id="CZCE")  # 主力合约
+        CZCE_Cont = self.api.query_quotes(ins_class='CONT', exchange_id="CZCE")  # 主连
+        CZCE_Future = self.api.query_quotes(ins_class='FUTURE', exchange_id="CZCE")  # 期货
+        CZCE_Index = self.api.query_quotes(ins_class='INDEX', exchange_id="CZCE")  # 指数
+        CZCE_option = self.api.query_quotes(ins_class='OPTION', exchange_id="CZCE")  # 期权
+
+        CFFEX_Main = self.api.query_cont_quotes(exchange_id="CFFEX")  # 主力合约
+        CFFEX_Cont = self.api.query_quotes(ins_class='CONT', exchange_id="CFFEX")  # 主连
+        CFFEX_Future = self.api.query_quotes(ins_class='FUTURE', exchange_id="CFFEX")  # 期货
+        CFFEX_Index = self.api.query_quotes(ins_class='INDEX', exchange_id="CFFEX")  # 指数
+        CFFEX_option = self.api.query_quotes(ins_class='OPTION', exchange_id="CFFEX")  # 期权
+
+        INE_Main = self.api.query_cont_quotes(exchange_id="INE")  # 主力合约
+        INE_Cont = self.api.query_quotes(ins_class='CONT', exchange_id="INE")  # 主连
+        INE_Future = self.api.query_quotes(ins_class='FUTURE', exchange_id="INE")  # 期货
+        INE_Index = self.api.query_quotes(ins_class='INDEX', exchange_id="INE")  # 指数
+        INE_option = self.api.query_quotes(ins_class='OPTION', exchange_id="INE")  # 期权
+
+        self.write_available_contracts_to_csv(DCE_Main, path = 'DCE_Main')
+        self.write_available_contracts_to_csv(DCE_Cont, path = 'DCE_Cont')
+        self.write_available_contracts_to_csv(DCE_Future, path = 'DCE_Future')
+        self.write_available_contracts_to_csv(DCE_Index, path = 'DCE_Index')
+        self.write_available_contracts_to_csv(DCE_option, path = 'DCE_Option')
+        self.write_available_contracts_to_csv(SHFE_Main, path = 'SHFE_Main')
+        self.write_available_contracts_to_csv(SHFE_Cont, path = 'SHFE_Cont')
+        self.write_available_contracts_to_csv(SHFE_Future, path = 'SHFE_Future')
+        self.write_available_contracts_to_csv(SHFE_Index, path = 'SHFE_Index')
+        self.write_available_contracts_to_csv(SHFE_option, path = 'SHFE_Option')
+        self.write_available_contracts_to_csv(CZCE_Main, path = 'CZCE_Main')
+        self.write_available_contracts_to_csv(CZCE_Cont, path = 'CZCE_Cont')
+        self.write_available_contracts_to_csv(CZCE_Future, path = 'CZCE_Future')
+        self.write_available_contracts_to_csv(CZCE_Index, path = 'CZCE_Index')
+        self.write_available_contracts_to_csv(CZCE_option, path = 'CZCE_Option')
+        self.write_available_contracts_to_csv(CFFEX_Main, path = 'CFFEX_Main')
+        self.write_available_contracts_to_csv(CFFEX_Cont, path = 'CFFEX_Cont')
+        self.write_available_contracts_to_csv(CFFEX_Future, path = 'CFFEX_Future')
+        self.write_available_contracts_to_csv(CFFEX_Index, path = 'CFFEX_Index')
+        self.write_available_contracts_to_csv(CFFEX_option, path = 'CFFEX_Option')
+        self.write_available_contracts_to_csv(INE_Main, path = 'INE_Main')
+        self.write_available_contracts_to_csv(INE_Cont, path = 'INE_Cont')
+        self.write_available_contracts_to_csv(INE_Future, path = 'INE_Future')
+        self.write_available_contracts_to_csv(INE_Index, path = 'INE_Index')
+        self.write_available_contracts_to_csv(INE_option, path = 'INE_Option')
+
+    def write_available_contracts_to_csv(self, list, path):
+        self.ioModal.judge_dirs_exist('./available_contracts')
+        pth = './available_contracts/' + path + '.csv'
+        self.ioModal.judge_file_exist(pth)
+        data = pd.DataFrame(data=list)
+        self.ioModal.write_datas_to_csv_file(data, pth)
 
 
     def create_normal_klines(self, value):
@@ -144,38 +212,40 @@ class TQServices(Process):
 
         data1 = klines_1min.drop(klines_1min[klines_1min['id']<0].index)         # 删除空行
         data1 = data1.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_1min.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_1min.csv'))
         self.ioModal.write_datas_to_csv_file(data1, path=('./Klines_data/' + value + '_1min.csv'))
 
         data2 = klines_15min.drop(klines_15min[klines_15min['id']<0].index)         # 删除空行
         data2 = data2.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_15min.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_15min.csv'))
         self.ioModal.write_datas_to_csv_file(data2, path=('./Klines_data/' + value + '_15min.csv'))
 
         daya3 = klines_30min.drop(klines_30min[klines_30min['id']<0].index)         # 删除空行
         daya3 = daya3.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_30min.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_30min.csv'))
         self.ioModal.write_datas_to_csv_file(daya3, path=('./Klines_data/' + value + '_30min.csv'))
 
         daya4 = klines_1hour.drop(klines_1hour[klines_1hour['id']<0].index)         # 删除空行
         daya4 = daya4.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_1hour.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_1hour.csv'))
         self.ioModal.write_datas_to_csv_file(daya4, path=('./Klines_data/' + value + '_1hour.csv'))
 
         daya5 = klines_2hour.drop(klines_2hour[klines_2hour['id']<0].index)         # 删除空行
         daya5 = daya5.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_2hour.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_2hour.csv'))
         self.ioModal.write_datas_to_csv_file(daya5, path=('./Klines_data/' + value + '_2hour.csv'))
 
         data6 = klines_4hour.drop(klines_4hour[klines_4hour['id']<0].index)         # 删除空行
         data6 = data6.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_4hour.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_4hour.csv'))
         self.ioModal.write_datas_to_csv_file(data6, path=('./Klines_data/' + value + '_4hour.csv'))
 
         data7 = klines_1day.drop(klines_1day[klines_1day['id']<0].index)         # 删除空行
         data7 = data7.reset_index(drop=True)                        # 重建索引
-        self.ioModal.judge_config_exist(path=('./Klines_data/' + value + '_1day.csv'))
+        self.ioModal.judge_file_exist(path=('./Klines_data/' + value + '_1day.csv'))
         self.ioModal.write_datas_to_csv_file(data7, path=('./Klines_data/' + value + '_1day.csv'))
+
+        print(value, '  的k线数据已保存到vcs文件')
 
 
 
@@ -185,20 +255,20 @@ if __name__ == '__main__':
     self_selection = Manager().dict()
     quote_dict = Manager().dict()
     current_Kline = Manager().dict()
-    current_Kline['Contracts'] = 'DCE.i2301'
+    current_Kline['Contracts'] = 'CFFEX.IO2207-C-4300'
     main_tq_account = 'a哆啦a梦'
-    main_tq__pwd = 'c168168'
+    main_tq_pwd = 'c168168'
     ioModal = ReadWriteCsv()
     data = ioModal.read_csv_file(path='./data/self_selection.csv')
     for index,row in data.iterrows():
         self_selection[index] = row['quote']
-    t = TQServices(args=(self_selection, quote_dict, current_Kline, main_tq_account, main_tq__pwd))
+    t = TQServices(args=(self_selection, quote_dict, current_Kline, main_tq_account, main_tq_pwd))
     t.start()
 
     while True:
         time.sleep(1)
-        print('自选列表:  ', self_selection)
-        print('当前行情引用:  ', quote_dict)
-        print('当前显示合约:  ', current_Kline)
-        print('天勤账户:  ', main_tq_account)
-        print('天勤密码:  ', main_tq__pwd)
+        # print('自选列表:  ', self_selection)
+        print('\n\n当前行情引用:  ', quote_dict)
+        print('\n\n当前显示合约:  ', current_Kline)
+        # print('天勤账户:  ', main_tq_account)
+        # print('天勤密码:  ', main_tq__pwd)

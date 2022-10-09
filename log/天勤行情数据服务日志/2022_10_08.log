@@ -1,0 +1,38 @@
+2022-10-08 20:08:44 -     INFO - 通知 a哆啦a梦: 登录成功
+2022-10-08 20:08:44 -     INFO - 通知 a哆啦a梦: 与 wss://otg-sim.shinnytech.com/trade 的网络连接已建立
+2022-10-08 20:08:44 -     INFO - 通知 : 与 wss://free-api.shinnytech.com/t/nfmd/front/mobile 的网络连接已建立
+文件./available_contracts/DCE_Cont.csv不存在，已创建空白文件
+文件./available_contracts/DCE_Future.csv不存在，已创建空白文件
+文件./available_contracts/DCE_Index.csv不存在，已创建空白文件
+文件./available_contracts/DCE_Option.csv不存在，已创建空白文件
+文件./available_contracts/SHFE_Cont.csv不存在，已创建空白文件
+文件./available_contracts/SHFE_Future.csv不存在，已创建空白文件
+文件./available_contracts/SHFE_Index.csv不存在，已创建空白文件
+文件./available_contracts/SHFE_Option.csv不存在，已创建空白文件
+文件./available_contracts/CZCE_Cont.csv不存在，已创建空白文件
+文件./available_contracts/CZCE_Future.csv不存在，已创建空白文件
+文件./available_contracts/CZCE_Index.csv不存在，已创建空白文件
+文件./available_contracts/CZCE_Option.csv不存在，已创建空白文件
+文件./available_contracts/CFFEX_Cont.csv不存在，已创建空白文件
+文件./available_contracts/CFFEX_Future.csv不存在，已创建空白文件
+文件./available_contracts/CFFEX_Index.csv不存在，已创建空白文件
+文件./available_contracts/CFFEX_Option.csv不存在，已创建空白文件
+文件./available_contracts/INE_Cont.csv不存在，已创建空白文件
+文件./available_contracts/INE_Future.csv不存在，已创建空白文件
+文件./available_contracts/INE_Index.csv不存在，已创建空白文件
+文件./available_contracts/INE_Option.csv不存在，已创建空白文件
+{'datetime': '2022-07-15 14:59:59.999501', 'ask_price1': 0.2, 'ask_volume1': 655, 'bid_price1': nan, 'bid_volume1': 0, 'ask_price2': nan, 'ask_volume2': 0, 'bid_price2': nan, 'bid_volume2': 0, 'ask_price3': nan, 'ask_volume3': 0, 'bid_price3': nan, 'bid_volume3': 0, 'ask_price4': nan, 'ask_volume4': 0, 'bid_price4': nan, 'bid_volume4': 0, 'ask_price5': nan, 'ask_volume5': 0, 'bid_price5': nan, 'bid_volume5': 0, 'last_price': 0.2, 'highest': 49.0, 'lowest': 0.2, 'open': 17.6, 'close': 0.2, 'average': 21.7, 'volume': 30768, 'amount': 66730700.0, 'open_interest': 0, 'settlement': nan, 'upper_limit': 455.0, 'lower_limit': 0.2, 'pre_open_interest': 4744, 'pre_settlement': 22.8, 'pre_close': 22.8, 'price_tick': 0.2, 'price_decs': 1, 'volume_multiple': 100.0, 'max_limit_order_volume': 20, 'max_market_order_volume': 0, 'min_limit_order_volume': 0, 'min_market_order_volume': 0, 'underlying_symbol': 'SSE.000300', 'strike_price': 4300.0, 'ins_class': 'OPTION', 'instrument_id': 'CFFEX.IO2207-C-4300', 'instrument_name': 'IO2207-C-4300', 'exchange_id': 'CFFEX', 'expired': True, 'trading_time': {"day": [["09:30:00", "11:30:00"], ["13:00:00", "15:00:00"]], "night": []}, 'expire_datetime': 1657868400.0, 'delivery_year': 2022, 'delivery_month': 7, 'last_exercise_datetime': 1657868400.0, 'exercise_year': 2022, 'exercise_month': 7, 'option_class': 'CALL', 'exercise_type': 'E', 'product_id': '', 'iopv': nan, 'public_float_share_quantity': 0, 'stock_dividend_ratio': [], 'cash_dividend_ratio': [], 'expire_rest_days': -85}
+ 运行到这里了
+2022-10-08 22:02:53 -     INFO - 通知 a哆啦a梦: 与 wss://otg-sim.shinnytech.com/trade 的网络连接已建立
+2022-10-08 22:02:53 -     INFO - 通知 : 与 wss://free-api.shinnytech.com/t/nfmd/front/mobile 的网络连接已建立
+2022-10-08 22:02:53 -     INFO - 通知 a哆啦a梦: 登录成功
+文件./available_contracts/DCE_Main.csv不存在，已创建空白文件
+文件./available_contracts/SHFE_Main.csv不存在，已创建空白文件
+文件./available_contracts/CZCE_Main.csv不存在，已创建空白文件
+文件./available_contracts/CFFEX_Main.csv不存在，已创建空白文件
+文件./available_contracts/INE_Main.csv不存在，已创建空白文件
+{'datetime': '2022-07-15 14:59:59.999501', 'ask_price1': 0.2, 'ask_volume1': 655, 'bid_price1': nan, 'bid_volume1': 0, 'ask_price2': nan, 'ask_volume2': 0, 'bid_price2': nan, 'bid_volume2': 0, 'ask_price3': nan, 'ask_volume3': 0, 'bid_price3': nan, 'bid_volume3': 0, 'ask_price4': nan, 'ask_volume4': 0, 'bid_price4': nan, 'bid_volume4': 0, 'ask_price5': nan, 'ask_volume5': 0, 'bid_price5': nan, 'bid_volume5': 0, 'last_price': 0.2, 'highest': 49.0, 'lowest': 0.2, 'open': 17.6, 'close': 0.2, 'average': 21.7, 'volume': 30768, 'amount': 66730700.0, 'open_interest': 0, 'settlement': nan, 'upper_limit': 455.0, 'lower_limit': 0.2, 'pre_open_interest': 4744, 'pre_settlement': 22.8, 'pre_close': 22.8, 'price_tick': 0.2, 'price_decs': 1, 'volume_multiple': 100.0, 'max_limit_order_volume': 20, 'max_market_order_volume': 0, 'min_limit_order_volume': 0, 'min_market_order_volume': 0, 'underlying_symbol': 'SSE.000300', 'strike_price': 4300.0, 'ins_class': 'OPTION', 'instrument_id': 'CFFEX.IO2207-C-4300', 'instrument_name': 'IO2207-C-4300', 'exchange_id': 'CFFEX', 'expired': True, 'trading_time': {"day": [["09:30:00", "11:30:00"], ["13:00:00", "15:00:00"]], "night": []}, 'expire_datetime': 1657868400.0, 'delivery_year': 2022, 'delivery_month': 7, 'last_exercise_datetime': 1657868400.0, 'exercise_year': 2022, 'exercise_month': 7, 'option_class': 'CALL', 'exercise_type': 'E', 'product_id': '', 'iopv': nan, 'public_float_share_quantity': 0, 'stock_dividend_ratio': [], 'cash_dividend_ratio': [], 'expire_rest_days': -85}
+ 运行到这里了
+2022-10-08 22:06:18 -     INFO - 通知 : 与 wss://free-api.shinnytech.com/t/nfmd/front/mobile 的网络连接已建立
+2022-10-08 22:06:18 -     INFO - 通知 a哆啦a梦: 登录成功
+2022-10-08 22:06:18 -     INFO - 通知 a哆啦a梦: 与 wss://otg-sim.shinnytech.com/trade 的网络连接已建立

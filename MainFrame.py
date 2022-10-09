@@ -16,15 +16,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
-    QLabel, QLineEdit, QListView, QPushButton,
-    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
+    QLabel, QListView, QPushButton, QSizePolicy,
+    QSpacerItem, QVBoxLayout, QWidget)
 import resource_rc
 
 class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(1304, 828)
+        Form.resize(1306, 830)
         Form.setStyleSheet(u"\n"
 "	background-color: rgb(0, 0, 0);\n"
 "	border-radius: 10px;\n"
@@ -97,16 +97,16 @@ class Ui_Form(object):
         self.frame_39.setFrameShape(QFrame.StyledPanel)
         self.frame_39.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_20 = QHBoxLayout(self.frame_39)
-        self.horizontalLayout_20.setSpacing(10)
+        self.horizontalLayout_20.setSpacing(2)
         self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
-        self.horizontalLayout_20.setContentsMargins(5, 0, 5, 0)
+        self.horizontalLayout_20.setContentsMargins(2, 0, 0, 0)
         self.Btn_draw_line_order = QPushButton(self.frame_39)
         self.Btn_draw_line_order.setObjectName(u"Btn_draw_line_order")
         self.Btn_draw_line_order.setMinimumSize(QSize(60, 30))
         self.Btn_draw_line_order.setMaximumSize(QSize(100, 40))
         self.Btn_draw_line_order.setStyleSheet(u"QPushButton {\n"
 "	color: rgb(255, 0, 127);	\n"
-"	font: 700 16pt \"\u7b49\u7ebf\";\n"
+"	font: 700 14pt \"\u7b49\u7ebf\";\n"
 "	border: 2px solid rgb(65, 51, 156);\n"
 "	border-radius: 15px;\n"
 "	background-color: rgb(20, 9, 70);\n"
@@ -130,7 +130,7 @@ class Ui_Form(object):
         self.Btn_draw_line_style.setMaximumSize(QSize(60, 30))
         self.Btn_draw_line_style.setStyleSheet(u"QPushButton {\n"
 "	color: rgb(255, 0, 127);	\n"
-"	font: 700 16pt \"\u7b49\u7ebf\";\n"
+"	font: 700 14pt \"\u7b49\u7ebf\";\n"
 "	border: 2px solid rgb(65, 51, 156);\n"
 "	border-radius: 15px;\n"
 "	background-color: rgb(20, 9, 70);\n"
@@ -171,7 +171,7 @@ class Ui_Form(object):
 
         self.label_28 = QLabel(self.frame_39)
         self.label_28.setObjectName(u"label_28")
-        self.label_28.setMinimumSize(QSize(0, 40))
+        self.label_28.setMinimumSize(QSize(0, 30))
         self.label_28.setMaximumSize(QSize(150, 16777215))
         font = QFont()
         font.setFamilies([u"\u7b49\u7ebf"])
@@ -198,32 +198,43 @@ class Ui_Form(object):
         self.comboBox_add_quote_exchange.addItem("")
         self.comboBox_add_quote_exchange.addItem("")
         self.comboBox_add_quote_exchange.setObjectName(u"comboBox_add_quote_exchange")
-        self.comboBox_add_quote_exchange.setMinimumSize(QSize(160, 30))
-        self.comboBox_add_quote_exchange.setMaximumSize(QSize(160, 30))
+        self.comboBox_add_quote_exchange.setMinimumSize(QSize(120, 30))
+        self.comboBox_add_quote_exchange.setMaximumSize(QSize(120, 30))
         self.comboBox_add_quote_exchange.setStyleSheet(u"/* \u672a\u4e0b\u62c9\u65f6\uff0cQComboBox\u7684\u6837\u5f0f */\n"
 "QComboBox {\n"
 "    border: 2px solid gray;   /* \u8fb9\u6846 */\n"
 "    border-radius: 15px;   /* \u5706\u89d2 */\n"
-"    padding: 1px 18px 1px 3px;   /* \u5b57\u4f53\u586b\u886c */\n"
+"    padding: 1px 1px 1px 5px;   /* \u5b57\u4f53\u586b\u886c */\n"
 "    color: rgb(0, 0, 0);    \n"
-"	font: 700 12pt \"\u7b49\u7ebf\";    \n"
+"	font: 700 10pt \"\u7b49\u7ebf\";    \n"
 "	background-color: rgb(255, 255, 255);\n"
 "}\n"
 "\n"
 "/* \u4e0b\u62c9\u540e\uff0c\u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u6837\u5f0f */\n"
 "QComboBox QAbstractItemView {\n"
-"    \n"
-"    border: 1px solid yellow;   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u8fb9\u6846 */\n"
-"    color: black;\n"
-"	border-radius: 3px;\n"
-"    background-color: rgb(225, 225, 225);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u80cc\u666f\u8272 */\n"
-"    selection-background-color: lightgreen;   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u88ab\u9009\u4e2d\u9879\u7684\u80cc\u666f\u8272 */\n"
+"    border: 1px solid rgb(65, 51, 156);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u8fb9\u6846 */\n"
+"    color: rgb(200, 200, 200);\n"
+"	border-radius: 0px;\n"
+"    background-color: rgb(13, 9, 36);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u80cc\u666f\u8272 */\n"
+"}\n"
+"QComboBox QAbstractItemView::item {\n"
+"	border:none;\n"
+"    height: 25px; \n"
+"}\n"
+"QComboBox QAbstractItemView::item:hover{\n"
+"	border: none;	\n"
+"	color: rgb(255, 0, 0);\n"
+"	background-color: rgb(65, 49, 188);\n"
+"\n"
+"}\n"
+"QComboBox"
+                        " QAbstractItemView::item:selected{\n"
+"	border: none;\n"
 "}\n"
 "/* \u4e0b\u62c9\u7bad\u5934\u6837\u5f0f */\n"
 " QComboBox::down-arrow {\n"
 "	\n"
-"	image: url(:/icon/ProcessT"
-                        "rader/icons/\u53cc\u4e0b\u62c9\u7bad\u5934.svg);\n"
+"	image: url(:/icon/ProcessTrader/icons/\u53cc\u4e0b\u62c9\u7bad\u5934.svg);\n"
 "	width: 10px; /* \u4e0b\u62c9\u7bad\u5934\u7684\u5bbd\u5ea6\uff08\u5efa\u8bae\u4e0e\u4e0b\u62c9\u6846drop-down\u7684\u5bbd\u5ea6\u4e00\u81f4\uff09 */ \n"
 "	background: rgb(255, 255, 255); /* \u4e0b\u62c9\u7bad\u5934\u7684\u7684\u80cc\u666f\u8272 */ \n"
 "	padding: 0px 0px 0px 0px; /* \u4e0a\u5185\u8fb9\u8ddd\u3001\u53f3\u5185\u8fb9\u8ddd\u3001\u4e0b\u5185\u8fb9\u8ddd\u3001\u5de6\u5185\u8fb9\u8ddd */\n"
@@ -232,11 +243,11 @@ class Ui_Form(object):
 "/* \u4e0b\u62c9\u6846\u6837\u5f0f */\n"
 "QComboBox::drop-down {\n"
 "   /* subcontrol-origin: padding;   /* \u5b50\u63a7\u4ef6\u5728\u7236\u5143\u7d20\u4e2d\u7684\u539f\u70b9\u77e9\u5f62\u3002\u5982\u679c\u672a\u6307\u5b9a\u6b64\u5c5e\u6027\uff0c\u5219\u9ed8\u8ba4\u4e3apadding\u3002 */\n"
-"   /* subcontrol-position: top right;   /* \u4e0b\u62c9\u6846\u7684\u4f4d\u7f6e\uff08\u53f3\u4e0a\uff09 */\n"
+"   /* subcontrol-position: top right;   /* \u4e0b\u62c9\u6846\u7684\u4f4d\u7f6e\uff08\u53f3"
+                        "\u4e0a\uff09 */\n"
 "    width: 20px;   /* \u4e0b\u62c9\u6846\u7684\u5bbd\u5ea6 */\n"
 "\n"
-"    border-left-width: 3px;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf"
-                        "\u5bbd\u5ea6 */\n"
+"    border-left-width: 3px;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u5bbd\u5ea6 */\n"
 "    border-left-color: darkgray;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u989c\u8272 */\n"
 "    border-left-style: solid;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u4e3a\u5b9e\u7ebf */\n"
 "    border-top-right-radius: 10px;   /* \u4e0b\u62c9\u6846\u7684\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\uff08\u5e94\u548c\u6574\u4e2aQComboBox\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\u4e00\u81f4\uff09 */\n"
@@ -245,51 +256,316 @@ class Ui_Form(object):
 "QComboBox:hover {\n"
 "	border: 3px solid rgb(255, 85, 0);\n"
 "}\n"
-"QComboBox:disabled{\n"
-"	color: rgb(0, 0, 0);\n"
-"	border-color: rgb(166, 166, 166);\n"
-"    background-color: rgb(186, 186, 186);\n"
-"}")
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/*\u53f3\u8fb9\u7684\u6ed1\u52a8\u6761*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 17px 0 17px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+""
+                        " QScrollBar::handle:vertical {	\n"
+"	background:rgba(249, 83, 255, 170);\n"
+"    min-height: 30px;\n"
+"	border-radius: 0px\n"
+" }\n"
+"/*\n"
+"\u6ed1\u5757\u60ac\u6d6e\uff0c\u6309\u4e0b*/\n"
+"QScrollBar::handle:hover:vertical,QScrollBar::handle:pressed:vertical{\n"
+"background:rgb(150, 0, 150);\n"
+"}\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-bottom-left-radius: 0px;\n"
+"    border-bottom-right-radius: 0px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-top-left-radius: 0px;\n"
+"    border-top-right-radius: 0px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: transparent;\n"
+" }\n"
+"\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical "
+                        "{\n"
+"     background: transparent;\n"
+" }\n"
+"QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed\n"
+"{	\n"
+"	background-color: transparent;\n"
+"}\n"
+"")
         self.comboBox_add_quote_exchange.setFrame(True)
         self.comboBox_add_quote_exchange.setModelColumn(0)
 
         self.horizontalLayout_20.addWidget(self.comboBox_add_quote_exchange, 0, Qt.AlignVCenter)
 
-        self.add_quote_symbol = QLineEdit(self.frame_39)
-        self.add_quote_symbol.setObjectName(u"add_quote_symbol")
-        self.add_quote_symbol.setMinimumSize(QSize(140, 32))
-        self.add_quote_symbol.setMaximumSize(QSize(140, 32))
-        self.add_quote_symbol.setStyleSheet(u"QLineEdit {\n"
-"	border: 2px solid rgb(45, 45, 45);\n"
-"	border-radius: 15px;\n"
-"	padding: 5px;\n"
-"	background-color: rgb(255, 255, 255);	\n"
-"	color: rgb(0, 0, 0);\n"
-"	font: 700 14pt \"\u7b49\u7ebf\";\n"
+        self.comboBox_contract_type = QComboBox(self.frame_39)
+        self.comboBox_contract_type.addItem("")
+        self.comboBox_contract_type.addItem("")
+        self.comboBox_contract_type.addItem("")
+        self.comboBox_contract_type.addItem("")
+        self.comboBox_contract_type.addItem("")
+        self.comboBox_contract_type.setObjectName(u"comboBox_contract_type")
+        self.comboBox_contract_type.setMinimumSize(QSize(140, 30))
+        self.comboBox_contract_type.setMaximumSize(QSize(140, 16777215))
+        self.comboBox_contract_type.setStyleSheet(u"/* \u672a\u4e0b\u62c9\u65f6\uff0cQComboBox\u7684\u6837\u5f0f */\n"
+"QComboBox {\n"
+"    border: 2px solid gray;   /* \u8fb9\u6846 */\n"
+"    border-radius: 15px;   /* \u5706\u89d2 */\n"
+"    padding: 1px 1px 1px 5px;   /* \u5b57\u4f53\u586b\u886c */\n"
+"    color: rgb(0, 0, 0);    \n"
+"	font: 700 10pt \"\u7b49\u7ebf\";    \n"
+"	background-color: rgb(255, 255, 255);\n"
 "}\n"
-"QLineEdit:hover {\n"
-"	border: 3px solid rgb(255, 85, 0);\n"
+"\n"
+"/* \u4e0b\u62c9\u540e\uff0c\u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u6837\u5f0f */\n"
+"QComboBox QAbstractItemView {\n"
+"    border: 1px solid rgb(65, 51, 156);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u8fb9\u6846 */\n"
+"    color: rgb(200, 200, 200);\n"
+"	border-radius: 0px;\n"
+"    background-color: rgb(13, 9, 36);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u80cc\u666f\u8272 */\n"
 "}\n"
-"QLineEdit:focus {\n"
-"	border: 3px solid rgb(255, 85, 0);\n"
+"QComboBox QAbstractItemView::item {\n"
+"	border:none;\n"
+"    height: 25px; \n"
+"}\n"
+"QComboBox QAbstractItemView::item:hover{\n"
+"	border: none;	\n"
 "	color: rgb(255, 0, 0);\n"
+"	background-color: rgb(65, 49, 188);\n"
+"\n"
 "}\n"
-"QLineEdit:disabled{\n"
-"	color: rgb(0, 0, 0);\n"
-"	border-color: rgb(166, 166, 166);\n"
-"    background-color: rgb(186, 186, 186);\n"
-"}")
+"QComboBox"
+                        " QAbstractItemView::item:selected{\n"
+"	border: none;\n"
+"}\n"
+"/* \u4e0b\u62c9\u7bad\u5934\u6837\u5f0f */\n"
+" QComboBox::down-arrow {\n"
+"	\n"
+"	image: url(:/icon/ProcessTrader/icons/\u53cc\u4e0b\u62c9\u7bad\u5934.svg);\n"
+"	width: 10px; /* \u4e0b\u62c9\u7bad\u5934\u7684\u5bbd\u5ea6\uff08\u5efa\u8bae\u4e0e\u4e0b\u62c9\u6846drop-down\u7684\u5bbd\u5ea6\u4e00\u81f4\uff09 */ \n"
+"	background: rgb(255, 255, 255); /* \u4e0b\u62c9\u7bad\u5934\u7684\u7684\u80cc\u666f\u8272 */ \n"
+"	padding: 0px 0px 0px 0px; /* \u4e0a\u5185\u8fb9\u8ddd\u3001\u53f3\u5185\u8fb9\u8ddd\u3001\u4e0b\u5185\u8fb9\u8ddd\u3001\u5de6\u5185\u8fb9\u8ddd */\n"
+" } \n"
+"\n"
+"/* \u4e0b\u62c9\u6846\u6837\u5f0f */\n"
+"QComboBox::drop-down {\n"
+"   /* subcontrol-origin: padding;   /* \u5b50\u63a7\u4ef6\u5728\u7236\u5143\u7d20\u4e2d\u7684\u539f\u70b9\u77e9\u5f62\u3002\u5982\u679c\u672a\u6307\u5b9a\u6b64\u5c5e\u6027\uff0c\u5219\u9ed8\u8ba4\u4e3apadding\u3002 */\n"
+"   /* subcontrol-position: top right;   /* \u4e0b\u62c9\u6846\u7684\u4f4d\u7f6e\uff08\u53f3"
+                        "\u4e0a\uff09 */\n"
+"    width: 20px;   /* \u4e0b\u62c9\u6846\u7684\u5bbd\u5ea6 */\n"
+"\n"
+"    border-left-width: 3px;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u5bbd\u5ea6 */\n"
+"    border-left-color: darkgray;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u989c\u8272 */\n"
+"    border-left-style: solid;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u4e3a\u5b9e\u7ebf */\n"
+"    border-top-right-radius: 10px;   /* \u4e0b\u62c9\u6846\u7684\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\uff08\u5e94\u548c\u6574\u4e2aQComboBox\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\u4e00\u81f4\uff09 */\n"
+"    border-bottom-right-radius: 10px;   /* \u540c\u4e0a */\n"
+"}\n"
+"QComboBox:hover {\n"
+"	border: 3px solid rgb(255, 85, 0);\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/*\u53f3\u8fb9\u7684\u6ed1\u52a8\u6761*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 17px 0 17px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+""
+                        " QScrollBar::handle:vertical {	\n"
+"	background:rgba(249, 83, 255, 170);\n"
+"    min-height: 30px;\n"
+"	border-radius: 0px\n"
+" }\n"
+"/*\n"
+"\u6ed1\u5757\u60ac\u6d6e\uff0c\u6309\u4e0b*/\n"
+"QScrollBar::handle:hover:vertical,QScrollBar::handle:pressed:vertical{\n"
+"background:rgb(150, 0, 150);\n"
+"}\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-bottom-left-radius: 0px;\n"
+"    border-bottom-right-radius: 0px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-top-left-radius: 0px;\n"
+"    border-top-right-radius: 0px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: transparent;\n"
+" }\n"
+"\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical "
+                        "{\n"
+"     background: transparent;\n"
+" }\n"
+"QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed\n"
+"{	\n"
+"	background-color: transparent;\n"
+"}\n"
+"")
+        self.comboBox_contract_type.setEditable(False)
 
-        self.horizontalLayout_20.addWidget(self.add_quote_symbol, 0, Qt.AlignVCenter)
+        self.horizontalLayout_20.addWidget(self.comboBox_contract_type)
+
+        self.comboBox_symbol = QComboBox(self.frame_39)
+        self.comboBox_symbol.setObjectName(u"comboBox_symbol")
+        self.comboBox_symbol.setMinimumSize(QSize(150, 30))
+        self.comboBox_symbol.setStyleSheet(u"/* \u672a\u4e0b\u62c9\u65f6\uff0cQComboBox\u7684\u6837\u5f0f */\n"
+"QComboBox {\n"
+"    border: 2px solid gray;   /* \u8fb9\u6846 */\n"
+"    border-radius: 15px;   /* \u5706\u89d2 */\n"
+"    padding: 1px 1px 1px 5px;   /* \u5b57\u4f53\u586b\u886c */\n"
+"    color: rgb(0, 0, 0);    \n"
+"	font: 700 10pt \"\u7b49\u7ebf\";    \n"
+"	background-color: rgb(255, 255, 255);\n"
+"}\n"
+"\n"
+"/* \u4e0b\u62c9\u540e\uff0c\u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u6837\u5f0f */\n"
+"QComboBox QAbstractItemView {\n"
+"    border: 1px solid rgb(65, 51, 156);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u8fb9\u6846 */\n"
+"    color: rgb(200, 200, 200);\n"
+"	border-radius: 0px;\n"
+"    background-color: rgb(13, 9, 36);   /* \u6574\u4e2a\u4e0b\u62c9\u7a97\u4f53\u7684\u80cc\u666f\u8272 */\n"
+"}\n"
+"QComboBox QAbstractItemView::item {\n"
+"	border:none;\n"
+"    height: 25px; \n"
+"}\n"
+"QComboBox QAbstractItemView::item:hover{\n"
+"	border: none;	\n"
+"	color: rgb(255, 0, 0);\n"
+"	background-color: rgb(65, 49, 188);\n"
+"\n"
+"}\n"
+"QComboBox"
+                        " QAbstractItemView::item:selected{\n"
+"	border: none;\n"
+"}\n"
+"/* \u4e0b\u62c9\u7bad\u5934\u6837\u5f0f */\n"
+" QComboBox::down-arrow {\n"
+"	\n"
+"	image: url(:/icon/ProcessTrader/icons/\u53cc\u4e0b\u62c9\u7bad\u5934.svg);\n"
+"	width: 10px; /* \u4e0b\u62c9\u7bad\u5934\u7684\u5bbd\u5ea6\uff08\u5efa\u8bae\u4e0e\u4e0b\u62c9\u6846drop-down\u7684\u5bbd\u5ea6\u4e00\u81f4\uff09 */ \n"
+"	background: rgb(255, 255, 255); /* \u4e0b\u62c9\u7bad\u5934\u7684\u7684\u80cc\u666f\u8272 */ \n"
+"	padding: 0px 0px 0px 0px; /* \u4e0a\u5185\u8fb9\u8ddd\u3001\u53f3\u5185\u8fb9\u8ddd\u3001\u4e0b\u5185\u8fb9\u8ddd\u3001\u5de6\u5185\u8fb9\u8ddd */\n"
+" } \n"
+"\n"
+"/* \u4e0b\u62c9\u6846\u6837\u5f0f */\n"
+"QComboBox::drop-down {\n"
+"   /* subcontrol-origin: padding;   /* \u5b50\u63a7\u4ef6\u5728\u7236\u5143\u7d20\u4e2d\u7684\u539f\u70b9\u77e9\u5f62\u3002\u5982\u679c\u672a\u6307\u5b9a\u6b64\u5c5e\u6027\uff0c\u5219\u9ed8\u8ba4\u4e3apadding\u3002 */\n"
+"   /* subcontrol-position: top right;   /* \u4e0b\u62c9\u6846\u7684\u4f4d\u7f6e\uff08\u53f3"
+                        "\u4e0a\uff09 */\n"
+"    width: 20px;   /* \u4e0b\u62c9\u6846\u7684\u5bbd\u5ea6 */\n"
+"\n"
+"    border-left-width: 3px;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u5bbd\u5ea6 */\n"
+"    border-left-color: darkgray;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u989c\u8272 */\n"
+"    border-left-style: solid;   /* \u4e0b\u62c9\u6846\u7684\u5de6\u8fb9\u754c\u7ebf\u4e3a\u5b9e\u7ebf */\n"
+"    border-top-right-radius: 10px;   /* \u4e0b\u62c9\u6846\u7684\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\uff08\u5e94\u548c\u6574\u4e2aQComboBox\u53f3\u4e0a\u8fb9\u754c\u7ebf\u7684\u5706\u89d2\u534a\u5f84\u4e00\u81f4\uff09 */\n"
+"    border-bottom-right-radius: 10px;   /* \u540c\u4e0a */\n"
+"}\n"
+"QComboBox:hover {\n"
+"	border: 3px solid rgb(255, 85, 0);\n"
+"}\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"/*\u53f3\u8fb9\u7684\u6ed1\u52a8\u6761*/\n"
+" QScrollBar:vertical {\n"
+"	border: none;\n"
+"    background: transparent;\n"
+"    width: 8px;\n"
+"    margin: 17px 0 17px 0;\n"
+"	border-radius: 0px;\n"
+" }\n"
+""
+                        " QScrollBar::handle:vertical {	\n"
+"	background:rgba(249, 83, 255, 170);\n"
+"    min-height: 30px;\n"
+"	border-radius: 0px\n"
+" }\n"
+"/*\n"
+"\u6ed1\u5757\u60ac\u6d6e\uff0c\u6309\u4e0b*/\n"
+"QScrollBar::handle:hover:vertical,QScrollBar::handle:pressed:vertical{\n"
+"background:rgb(150, 0, 150);\n"
+"}\n"
+" QScrollBar::add-line:vertical {\n"
+"     border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-bottom-left-radius: 0px;\n"
+"    border-bottom-right-radius: 0px;\n"
+"     subcontrol-position: bottom;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::sub-line:vertical {\n"
+"	border: none;\n"
+"	background-color: transparent;\n"
+"     height: 15px;\n"
+"	border-top-left-radius: 0px;\n"
+"    border-top-right-radius: 0px;\n"
+"     subcontrol-position: top;\n"
+"     subcontrol-origin: margin;\n"
+" }\n"
+" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+"     background: transparent;\n"
+" }\n"
+"\n"
+" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical "
+                        "{\n"
+"     background: transparent;\n"
+" }\n"
+"QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed\n"
+"{	\n"
+"	background-color: transparent;\n"
+"}\n"
+"")
+        self.comboBox_symbol.setMaxVisibleItems(30)
+
+        self.horizontalLayout_20.addWidget(self.comboBox_symbol)
 
         self.Btn_add_self_selection_contracts = QPushButton(self.frame_39)
         self.Btn_add_self_selection_contracts.setObjectName(u"Btn_add_self_selection_contracts")
-        self.Btn_add_self_selection_contracts.setMinimumSize(QSize(80, 30))
-        self.Btn_add_self_selection_contracts.setMaximumSize(QSize(80, 30))
+        self.Btn_add_self_selection_contracts.setMinimumSize(QSize(60, 30))
+        self.Btn_add_self_selection_contracts.setMaximumSize(QSize(60, 30))
         self.Btn_add_self_selection_contracts.setStyleSheet(u"QPushButton{\n"
 "	color: rgb(13, 9, 36);\n"
 "	background-color:rgb(255, 0, 127);\n"
-"	font: 700 16pt \"\u7b49\u7ebf\";\n"
+"	font: 700 14pt \"\u7b49\u7ebf\";\n"
 "	border-radius: 15px;\n"
 "}\n"
 "QPushButton:hover{\n"
@@ -1394,6 +1670,10 @@ class Ui_Form(object):
 
         self.retranslateUi(Form)
 
+        self.comboBox_add_quote_exchange.setCurrentIndex(0)
+        self.comboBox_contract_type.setCurrentIndex(-1)
+
+
         QMetaObject.connectSlotsByName(Form)
     # setupUi
 
@@ -1402,12 +1682,18 @@ class Ui_Form(object):
         self.Btn_draw_line_order.setText(QCoreApplication.translate("Form", u"\u753b\u7ebf", None))
         self.Btn_draw_line_style.setText(QCoreApplication.translate("Form", u"\u6837\u5f0f", None))
         self.label_kline_info.setText("")
-        self.label_28.setText(QCoreApplication.translate("Form", u"\u6dfb\u52a0\u81ea\u9009\u5408\u7ea6:", None))
+        self.label_28.setText(QCoreApplication.translate("Form", u"\u6dfb\u52a0\u81ea\u9009:", None))
         self.comboBox_add_quote_exchange.setItemText(0, QCoreApplication.translate("Form", u"\u5927\u5546\u6240 DCE", None))
         self.comboBox_add_quote_exchange.setItemText(1, QCoreApplication.translate("Form", u"\u4e0a\u671f\u6240 SHFE", None))
         self.comboBox_add_quote_exchange.setItemText(2, QCoreApplication.translate("Form", u"\u90d1\u5546\u6240 CZCE", None))
         self.comboBox_add_quote_exchange.setItemText(3, QCoreApplication.translate("Form", u"\u80fd\u6e90\u4ea4\u6613\u6240 INE", None))
         self.comboBox_add_quote_exchange.setItemText(4, QCoreApplication.translate("Form", u"\u4e2d\u91d1\u6240 CFFEX", None))
+
+        self.comboBox_contract_type.setItemText(0, QCoreApplication.translate("Form", u"\u4e3b\u529b\u5408\u7ea6 Main", None))
+        self.comboBox_contract_type.setItemText(1, QCoreApplication.translate("Form", u"\u6240\u6709\u5408\u7ea6 Future", None))
+        self.comboBox_contract_type.setItemText(2, QCoreApplication.translate("Form", u"\u4e3b\u529b\u8fde\u7eed Cont", None))
+        self.comboBox_contract_type.setItemText(3, QCoreApplication.translate("Form", u"\u5408\u7ea6\u6307\u6570 Index", None))
+        self.comboBox_contract_type.setItemText(4, QCoreApplication.translate("Form", u"\u671f\u6743\u5408\u7ea6 Option", None))
 
         self.Btn_add_self_selection_contracts.setText(QCoreApplication.translate("Form", u"\u6dfb\u52a0", None))
         self.Btn_klines_1min.setText(QCoreApplication.translate("Form", u"1\n"

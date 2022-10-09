@@ -1,7 +1,7 @@
 import pandas
 from datetime import datetime
 from tqsdk import tafunc
-path = './klines_data/' + 'i2301_1day' + '.csv'
+path = './Klines_data/' + 'i2301_1day' + '.csv'
 datas = pandas.read_csv(path)
 xAixs = 100
 

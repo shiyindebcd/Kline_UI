@@ -3,6 +3,34 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="\Klines_data\DCE.i2301_1hour.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\Klines_data\KQ.m@DCE.bb_1day.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\Klines_data\KQ.m@DCE.bb_1min.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\Klines_data\KQ.m@DCE.bb_4hour.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\Klines_data\SHFE.rb2210_2hour.csv">
           <value>
             <Attribute>
@@ -10,35 +38,77 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\DCE.i2301_1day.csv">
+        <entry key="\available_contracts\CFFEX_Cont.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\DCE.i2301_1min.csv">
+        <entry key="\available_contracts\CFFEX_Index.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\SHFE.rb2210_15min.csv">
+        <entry key="\available_contracts\CFFEX_Option.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\SHFE.rb2210_1hour.csv">
+        <entry key="\available_contracts\CFFEX_option.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\SHFE.rb2210_2hour.csv">
+        <entry key="\available_contracts\CZCE_Cont.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\available_contracts\CZCE_Future.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\available_contracts\DCE_Future.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\available_contracts\DCE_Index.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\available_contracts\DCE_Option.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\available_contracts\INE_Cont.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\data\main_tq_account.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -53,13 +123,6 @@
           </value>
         </entry>
         <entry key="\klines_data\DCE.i2301_1day.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\klines_data\i2301_1day.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
